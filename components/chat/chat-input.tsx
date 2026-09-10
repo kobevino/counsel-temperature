@@ -1,7 +1,6 @@
 "use client";
 
 import { useSessionStore, useActiveSession } from "@/store/session";
-import { scripts } from "@/lib/mock/scripts";
 import { SendIcon } from "@/components/icons";
 
 const QUICK_ACTIONS = [
@@ -11,56 +10,15 @@ const QUICK_ACTIONS = [
 ];
 
 export default function ChatInput() {
-  const activeCustomerId = useSessionStore((s) => s.activeCustomerId);
   const session = useActiveSession();
   const draft = useSessionStore((s) => s.draft);
   const setDraft = useSessionStore((s) => s.setDraft);
   const send = useSessionStore((s) => s.sendCounselorMessage);
-  const chooseBranch = useSessionStore((s) => s.chooseBranch);
-  const demoHints = useSessionStore((s) => s.demoHints);
-  const toggleDemoHints = useSessionStore((s) => s.toggleDemoHints);
 
-  const nextStep = scripts[activeCustomerId]?.[session.scriptCursor];
-  const blocked = session.customerTyping || !!session.pendingBranch;
+  const blocked = session.customerTyping;
 
   return (
     <div className="border-t border-line bg-surface px-4 pb-4 pt-3">
-      {session.pendingBranch ? (
-        <div className="mb-3 rounded-xl border border-brand/30 bg-brand-soft px-3.5 py-3">
-          <p className="text-[12px] font-semibold text-brand">
-            고객 반응 선택 <span className="font-normal text-ink-faint">(데모 분기)</span>
-          </p>
-          <div className="mt-2 flex gap-2">
-            {session.pendingBranch.map((option) => (
-              <button
-                key={option.label}
-                onClick={() => chooseBranch(option)}
-                className="flex-1 rounded-lg border border-line bg-surface px-3 py-2 text-left text-[13px] hover:border-brand"
-              >
-                <span className="font-semibold text-brand">{option.label}</span>
-                <span className="mt-0.5 block truncate text-ink-soft">
-                  {option.customer}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      ) : (
-        demoHints &&
-        nextStep && (
-          <p className="mb-2 truncate px-1 text-[12px] text-ink-faint">
-            <button
-              onClick={toggleDemoHints}
-              className="mr-1.5 rounded bg-canvas px-1.5 py-0.5 text-[10px] font-semibold text-ink-faint"
-              title="대본 힌트 끄기"
-            >
-              힌트
-            </button>
-            다음 대본: {nextStep.expect}
-          </p>
-        )
-      )}
-
       <form
         onSubmit={(e) => {
           e.preventDefault();

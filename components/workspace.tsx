@@ -20,6 +20,13 @@ export default function Workspace() {
   const customer =
     customers.find((c) => c.id === activeCustomerId) ?? customers[0];
 
+  // a reply request in flight doesn't survive a refresh — if the active
+  // session's turn is still open (last message from the counselor), re-request
+  const requestCustomerReply = useSessionStore((s) => s.requestCustomerReply);
+  useEffect(() => {
+    if (mounted) requestCustomerReply(activeCustomerId);
+  }, [mounted, activeCustomerId, requestCustomerReply]);
+
   if (!mounted) {
     return <div className="h-screen bg-canvas" />;
   }

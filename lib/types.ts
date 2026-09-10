@@ -12,18 +12,6 @@ export type Message = {
   at: number;
 };
 
-export type BranchOption = {
-  label: string;
-  customer: string;
-};
-
-export type ScriptStep = {
-  /** what the script expects the counselor to say next (shown as a hint) */
-  expect: string;
-  customer?: string;
-  branch?: BranchOption[];
-};
-
 // ---------- Customer ----------
 
 export type CustomerStatus = "접수" | "문의" | "응대" | "종료";

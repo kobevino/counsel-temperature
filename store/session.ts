@@ -1,22 +1,18 @@
 "use client";
 
+import axios from "axios";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type {
-  BranchOption,
-  Message,
-  TemperatureSnapshot,
-} from "@/lib/types";
-import { initialMessages, scripts } from "@/lib/mock/scripts";
+import type { Message, TemperatureSnapshot } from "@/lib/types";
+import { initialMessages } from "@/lib/mock/scripts";
 import { customers } from "@/lib/mock/customers";
+import { mockCustomerReply } from "@/lib/mock/replies";
 
 const TURN_GAP = 60_000; // 1 scripted minute per exchange
 
 export type CustomerSession = {
   messages: Message[];
-  scriptCursor: number;
   customerTyping: boolean;
-  pendingBranch: BranchOption[] | null;
   snapshots: TemperatureSnapshot[];
   liveSeq: number;
 };
@@ -24,16 +20,15 @@ export type CustomerSession = {
 type SessionStore = {
   activeCustomerId: string;
   sessions: Record<string, CustomerSession>;
-  demoHints: boolean;
   draft: string;
   /** message to flash-highlight when an evidence quote is clicked (transient) */
   highlightId: string | null;
   selectCustomer: (id: string) => void;
   setDraft: (text: string) => void;
   setHighlight: (id: string | null) => void;
-  toggleDemoHints: () => void;
   sendCounselorMessage: (text: string) => void;
-  chooseBranch: (option: BranchOption) => void;
+  /** ask the reply engine for the customer's next message (idempotent per customer) */
+  requestCustomerReply: (customerId: string) => void;
   addSnapshot: (customerId: string, snapshot: TemperatureSnapshot) => void;
   resetSession: (id: string) => void;
 };
@@ -41,9 +36,7 @@ type SessionStore = {
 function freshSession(customerId: string): CustomerSession {
   return {
     messages: initialMessages[customerId] ?? [],
-    scriptCursor: 0,
     customerTyping: false,
-    pendingBranch: null,
     snapshots: [],
     liveSeq: 0,
   };
@@ -53,51 +46,45 @@ function initialSessions(): Record<string, CustomerSession> {
   return Object.fromEntries(customers.map((c) => [c.id, freshSession(c.id)]));
 }
 
-function replyDelay(text: string): number {
+/** minimum on-screen typing time so replies don't pop in instantly */
+function typingDelay(text: string): number {
   return Math.min(2500, 600 + text.length * 25);
 }
+
+// reply requests in flight, keyed by customer — module-level so persist can't resurrect them
+const inFlight = new Set<string>();
 
 export const useSessionStore = create<SessionStore>()(
   persist(
     (set, get) => {
-      /** append the customer reply after a typing delay */
-      const scheduleCustomerReply = (customerId: string, text: string) => {
-        set((s) => ({
-          sessions: {
-            ...s.sessions,
-            [customerId]: { ...s.sessions[customerId], customerTyping: true },
-          },
-        }));
-        setTimeout(() => {
-          set((s) => {
-            const session = s.sessions[customerId];
-            if (!session) return s;
-            const last = session.messages[session.messages.length - 1];
-            const msg: Message = {
-              id: `${customerId}-live-${session.liveSeq + 1}`,
-              role: "customer",
-              text,
-              at: (last?.at ?? 0) + TURN_GAP,
-            };
-            return {
-              sessions: {
-                ...s.sessions,
-                [customerId]: {
-                  ...session,
-                  customerTyping: false,
-                  messages: [...session.messages, msg],
-                  liveSeq: session.liveSeq + 1,
-                },
+      const appendCustomerMessage = (customerId: string, text: string) => {
+        set((s) => {
+          const session = s.sessions[customerId];
+          if (!session) return s;
+          const last = session.messages[session.messages.length - 1];
+          const msg: Message = {
+            id: `${customerId}-live-${session.liveSeq + 1}`,
+            role: "customer",
+            text,
+            at: (last?.at ?? 0) + TURN_GAP,
+          };
+          return {
+            sessions: {
+              ...s.sessions,
+              [customerId]: {
+                ...session,
+                customerTyping: false,
+                messages: [...session.messages, msg],
+                liveSeq: session.liveSeq + 1,
               },
-            };
-          });
-        }, replyDelay(text));
+            },
+          };
+        });
       };
 
       return {
         activeCustomerId: "park",
         sessions: initialSessions(),
-        demoHints: true,
         draft: "",
         highlightId: null,
 
@@ -105,14 +92,13 @@ export const useSessionStore = create<SessionStore>()(
           set({ activeCustomerId: id, draft: "", highlightId: null }),
         setDraft: (text) => set({ draft: text }),
         setHighlight: (id) => set({ highlightId: id }),
-        toggleDemoHints: () => set((s) => ({ demoHints: !s.demoHints })),
 
         sendCounselorMessage: (text) => {
           const trimmed = text.trim();
           if (!trimmed) return;
           const { activeCustomerId } = get();
           const session = get().sessions[activeCustomerId];
-          if (!session || session.customerTyping || session.pendingBranch) return;
+          if (!session || session.customerTyping) return;
 
           const last = session.messages[session.messages.length - 1];
           const msg: Message = {
@@ -121,7 +107,6 @@ export const useSessionStore = create<SessionStore>()(
             text: trimmed,
             at: (last?.at ?? 0) + TURN_GAP,
           };
-          const step = scripts[activeCustomerId]?.[session.scriptCursor];
 
           set((s) => ({
             draft: "",
@@ -131,34 +116,46 @@ export const useSessionStore = create<SessionStore>()(
                 ...s.sessions[activeCustomerId],
                 messages: [...s.sessions[activeCustomerId].messages, msg],
                 liveSeq: s.sessions[activeCustomerId].liveSeq + 1,
-                scriptCursor: step
-                  ? s.sessions[activeCustomerId].scriptCursor + 1
-                  : s.sessions[activeCustomerId].scriptCursor,
-                pendingBranch: step?.branch ?? null,
               },
             },
           }));
 
-          if (step?.customer) {
-            scheduleCustomerReply(activeCustomerId, step.customer);
-          }
-          // branch steps wait for chooseBranch; no step left → customer stays silent
+          get().requestCustomerReply(activeCustomerId);
         },
 
-        chooseBranch: (option) => {
-          const { activeCustomerId } = get();
-          const session = get().sessions[activeCustomerId];
-          if (!session?.pendingBranch) return;
+        requestCustomerReply: (customerId) => {
+          const session = get().sessions[customerId];
+          if (!session || inFlight.has(customerId)) return;
+          const last = session.messages[session.messages.length - 1];
+          if (last?.role !== "counselor") return; // customer already answered
+
+          inFlight.add(customerId);
           set((s) => ({
             sessions: {
               ...s.sessions,
-              [activeCustomerId]: {
-                ...s.sessions[activeCustomerId],
-                pendingBranch: null,
-              },
+              [customerId]: { ...s.sessions[customerId], customerTyping: true },
             },
           }));
-          scheduleCustomerReply(activeCustomerId, option.customer);
+
+          const startedAt = Date.now();
+          axios
+            .post<{ text: string }>("/api/customer-reply", {
+              customerId,
+              messages: session.messages,
+            })
+            .then(({ data }) => data.text)
+            // network/server failure → local template so the customer never goes silent
+            .catch(() => mockCustomerReply(customerId, session.messages))
+            .then((text) => {
+              const remaining = Math.max(
+                0,
+                typingDelay(text) - (Date.now() - startedAt),
+              );
+              setTimeout(() => {
+                inFlight.delete(customerId);
+                appendCustomerMessage(customerId, text);
+              }, remaining);
+            });
         },
 
         addSnapshot: (customerId, snapshot) =>
@@ -190,22 +187,25 @@ export const useSessionStore = create<SessionStore>()(
       partialize: (s) => ({
         activeCustomerId: s.activeCustomerId,
         sessions: s.sessions,
-        demoHints: s.demoHints,
       }),
       merge: (persisted, current) => {
         const p = persisted as Partial<
-          Pick<SessionStore, "activeCustomerId" | "sessions" | "demoHints">
+          Pick<SessionStore, "activeCustomerId" | "sessions">
         > | null;
         if (!p) return current;
-        // timers don't survive a refresh — clear transient typing flags
+        // in-flight requests don't survive a refresh — clear transient typing flags;
+        // Workspace re-requests any reply whose turn is still open (last message = counselor)
         const sessions = { ...current.sessions };
         for (const [id, session] of Object.entries(p.sessions ?? {})) {
-          sessions[id] = { ...session, customerTyping: false };
+          sessions[id] = {
+            ...freshSession(id),
+            ...session,
+            customerTyping: false,
+          };
         }
         return {
           ...current,
           activeCustomerId: p.activeCustomerId ?? current.activeCustomerId,
-          demoHints: p.demoHints ?? current.demoHints,
           sessions,
         };
       },
