@@ -10,8 +10,7 @@ export default function RiskGauge({
   snapshot: TemperatureSnapshot | undefined;
   customerTurns: number;
 }) {
-  const insufficient =
-    !snapshot || customerTurns < 3 || snapshot.confidence === "low";
+  const insufficient = !snapshot;
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
@@ -20,10 +19,10 @@ export default function RiskGauge({
       {insufficient ? (
         <div className="mt-2">
           <p className="text-[15px] font-semibold text-ink-faint">
-            판단 근거 부족
+            분석 대기 중
           </p>
           <p className="mt-0.5 text-[12px] text-ink-faint">
-            고객 발화 {customerTurns}개 — 대화가 더 쌓이면 분석이 표시됩니다.
+            고객 발화 {customerTurns}개 — 첫 분석 결과를 기다리고 있습니다.
           </p>
         </div>
       ) : (
@@ -34,11 +33,16 @@ export default function RiskGauge({
           >
             {snapshot.risk}%
           </span>
-          <span
-            className="rounded-md px-2.5 py-1 text-[13px] font-bold text-white"
-            style={{ backgroundColor: BAND_META[snapshot.band].color }}
-          >
-            {BAND_META[snapshot.band].label}
+          <span className="flex flex-col items-end gap-1">
+            <span
+              className="rounded-md px-2.5 py-1 text-[13px] font-bold text-white"
+              style={{ backgroundColor: BAND_META[snapshot.band].color }}
+            >
+              {BAND_META[snapshot.band].label}
+            </span>
+            {snapshot.confidence === "low" && (
+              <span className="text-[11px] text-ink-faint">신뢰도 낮음</span>
+            )}
           </span>
         </div>
       )}

@@ -7,7 +7,7 @@ import { useActiveSession, useSessionStore } from "@/store/session";
 import type { Message, TemperatureSnapshot } from "@/lib/types";
 
 /** below this many customer utterances there is nothing to judge */
-export const MIN_CUSTOMER_MESSAGES = 3;
+export const MIN_CUSTOMER_MESSAGES = 1;
 
 type AnalyzeVars = {
   customerId: string;

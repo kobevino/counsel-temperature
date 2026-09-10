@@ -30,7 +30,7 @@ http://localhost:3000 접속. `OPENAI_API_KEY`가 없으면 자동으로 mock �
 
 - `app/api/customer-reply/route.ts` — 고객 답변 생성. `lib/mock/replies.ts`의 키워드 템플릿 룰 베이스로 동작하며 외부 API를 호출하지 않는다.
 - `app/api/temperature/route.ts` — 온도 분석. LLM은 4축(관심/신뢰/의향/저항) 평가와 발화 인용만 담당하고, 최종 이탈 위험도는 `lib/score.ts`의 가중합으로 계산. 인용은 `lib/quotes.ts`에서 실제 발화 대조로 검증(환각 가드).
-- `store/session.ts` — zustand + sessionStorage persist. 상담사 발화 → 고객 답변 요청, 스냅샷 이력. 새로고침으로 답변 요청이 끊기면 재요청.
+- `store/session.ts` — zustand(비영속). 상담사 발화 → 고객 답변 요청, 스냅샷 이력. 새로고침하면 모든 대화가 초기 상태로 리셋된다.
 - `hooks/useTemperature.ts` — react-query mutation, 고객 발화마다 자동 트리거(latest-wins 중복 방지).
 - `lib/mock/` — 고객 4명 + 오프닝 대화 + 키워드 응답 템플릿.
 - `components/coach/` — 이탈 확률 게이지, 턴별 추이 차트, AI 코칭 알림, 분석 근거.

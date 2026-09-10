@@ -2,7 +2,6 @@
 
 import axios from "axios";
 import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 import type { Message, TemperatureSnapshot } from "@/lib/types";
 import { initialMessages } from "@/lib/mock/scripts";
 import { customers } from "@/lib/mock/customers";
@@ -51,12 +50,11 @@ function typingDelay(text: string): number {
   return Math.min(2500, 600 + text.length * 25);
 }
 
-// reply requests in flight, keyed by customer — module-level so persist can't resurrect them
+// reply requests in flight, keyed by customer
 const inFlight = new Set<string>();
 
-export const useSessionStore = create<SessionStore>()(
-  persist(
-    (set, get) => {
+// state is intentionally NOT persisted — a refresh resets every conversation
+export const useSessionStore = create<SessionStore>()((set, get) => {
       const appendCustomerMessage = (customerId: string, text: string) => {
         set((s) => {
           const session = s.sessions[customerId];
@@ -180,38 +178,7 @@ export const useSessionStore = create<SessionStore>()(
             sessions: { ...s.sessions, [id]: freshSession(id) },
           })),
       };
-    },
-    {
-      name: "counsel-temperature-session",
-      storage: createJSONStorage(() => sessionStorage),
-      partialize: (s) => ({
-        activeCustomerId: s.activeCustomerId,
-        sessions: s.sessions,
-      }),
-      merge: (persisted, current) => {
-        const p = persisted as Partial<
-          Pick<SessionStore, "activeCustomerId" | "sessions">
-        > | null;
-        if (!p) return current;
-        // in-flight requests don't survive a refresh — clear transient typing flags;
-        // Workspace re-requests any reply whose turn is still open (last message = counselor)
-        const sessions = { ...current.sessions };
-        for (const [id, session] of Object.entries(p.sessions ?? {})) {
-          sessions[id] = {
-            ...freshSession(id),
-            ...session,
-            customerTyping: false,
-          };
-        }
-        return {
-          ...current,
-          activeCustomerId: p.activeCustomerId ?? current.activeCustomerId,
-          sessions,
-        };
-      },
-    },
-  ),
-);
+    });
 
 export function useActiveSession(): CustomerSession {
   const activeCustomerId = useSessionStore((s) => s.activeCustomerId);

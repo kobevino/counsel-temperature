@@ -19,8 +19,7 @@ export default function CoachPanel({
   const session = useActiveSession();
   const latest = session.snapshots[session.snapshots.length - 1];
   const turns = customerTurn(session.messages);
-  const showDetails =
-    latest && turns >= MIN_CUSTOMER_MESSAGES && latest.confidence !== "low";
+  const showDetails = !!latest && turns >= MIN_CUSTOMER_MESSAGES;
 
   return (
     <aside className="flex h-full min-h-0 flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
