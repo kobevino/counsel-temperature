@@ -32,7 +32,7 @@ export default function Workspace() {
   }
 
   return (
-    <main className="grid h-screen min-w-[1200px] grid-cols-[300px_minmax(480px,1fr)_280px_300px] overflow-hidden">
+    <main className="grid h-screen min-w-[1200px] grid-cols-[300px_minmax(480px,1fr)_280px_300px] grid-rows-[minmax(0,1fr)] overflow-hidden">
       <CustomerList />
       <ChatPanel customer={customer} />
       <CustomerInfo customer={customer} />
