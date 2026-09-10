@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #ffffff;
+  --color-canvas: #f7f8fa;
+  --color-line: #e8eaf0;
+  --color-ink: #1a1d26;
+  --color-ink-soft: #6b7280;
+  --color-ink-faint: #9ca3af;
+  --color-brand: #4f5bd5;
+  --color-brand-soft: #eef0fb;
+  --color-bubble-customer: #ffffff;
+  --color-bubble-counselor: #e9ebfa;
+  --color-band-safe: #2fa47a;
+  --color-band-caution: #e5a93d;
+  --color-band-risk: #e8827c;
+  --color-band-urgent: #d64550;
+  --color-alert-bg: #fdeef0;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family:
+    "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes evidence-flash {
+  0% {
+    background-color: rgba(79, 91, 213, 0.18);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.evidence-flash {
+  animation: evidence-flash 1.6s ease-out;
+  border-radius: 12px;
+}
+
+@keyframes typing-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typing-dot 1.2s infinite;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
