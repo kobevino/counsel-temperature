@@ -1,5 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
+import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 import {
   AXIS_KEYS,
@@ -124,32 +124,21 @@ export async function POST(req: Request) {
     | TemperatureSnapshot
     | undefined;
 
-  if (process.env.TEMPERATURE_MOCK === "1" || !process.env.ANTHROPIC_API_KEY) {
+  if (process.env.TEMPERATURE_MOCK === "1" || !process.env.OPENAI_API_KEY) {
     const reading = mockReading(messages, previousSnapshot?.risk);
     return Response.json(toSnapshot(reading, messages));
   }
 
-  const client = new Anthropic();
-  const response = await client.messages.parse({
-    model: "claude-opus-5",
-    max_tokens: 4096,
-    system: [
-      {
-        type: "text",
-        text: SYSTEM_PROMPT,
-        cache_control: { type: "ephemeral" },
-      },
-    ],
-    messages: [
-      { role: "user", content: buildUserMessage(messages, previousSnapshot) },
-    ],
-    output_config: {
-      format: zodOutputFormat(ReadingSchema),
-      effort: "low",
-    },
+  const client = new OpenAI();
+  const response = await client.responses.parse({
+    model: "gpt-5-mini",
+    instructions: SYSTEM_PROMPT,
+    input: buildUserMessage(messages, previousSnapshot),
+    reasoning: { effort: "low" },
+    text: { format: zodTextFormat(ReadingSchema, "reading") },
   });
 
-  const reading = response.parsed_output;
+  const reading = response.output_parsed;
   if (!reading) {
     return Response.json(
       { error: "analysis output could not be parsed" },
