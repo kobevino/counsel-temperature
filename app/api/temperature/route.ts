@@ -107,7 +107,7 @@ function mockReading(messages: Message[], previousRisk?: number): Reading {
     trust: { score: scores.trust, quotes: pick(/입력은|출퇴근|남편/), note: "정보 공개 여부 기준 추정치(mock)" },
     intent: { score: scores.intent, quotes: pick(/보내주세요|가입|얼마/), note: "구매 신호 키워드 기준 추정치(mock)" },
     resistance: { score: scores.resistance, quotes: pick(/생각해|나중에|좀 그런데/), note: "회피 표현 기준 추정치(mock)" },
-    confidence: customer.length >= 4 ? "medium" : "low",
+    confidence: customer.length >= 3 ? "medium" : "low",
     change,
     trigger: last,
     nextAction,
