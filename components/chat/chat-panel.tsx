@@ -18,6 +18,7 @@ export default function ChatPanel({ customer }: { customer: Customer }) {
         customer={customer}
         messages={session.messages}
         customerTyping={session.customerTyping}
+        lastCustomerAt={session.lastCustomerAt}
       />
       <ChatInput />
     </section>

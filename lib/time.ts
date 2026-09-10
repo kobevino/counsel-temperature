@@ -7,6 +7,21 @@ export function formatClock(startedAt: string, at: number): string {
   return `${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`;
 }
 
+/** duration in ms → "3분 12초" / "47초" */
+export function formatDuration(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const min = Math.floor(total / 60);
+  const sec = total % 60;
+  if (min === 0) return `${sec}초`;
+  return `${min}분 ${sec}초`;
+}
+
+/** customer-list "N분 전" / "방금" label → offset in ms */
+export function agoToMs(label: string): number {
+  const match = label.match(/(\d+)\s*분/);
+  return match ? Number(match[1]) * 60_000 : 0;
+}
+
 /** "14:18" → "오늘 오후 2:18" */
 export function formatDateLabel(startedAt: string): string {
   const [h, m] = startedAt.split(":").map(Number);

@@ -6,6 +6,7 @@ import type { Message, TemperatureSnapshot } from "@/lib/types";
 import { initialMessages } from "@/lib/mock/scripts";
 import { customers } from "@/lib/mock/customers";
 import { mockCustomerReply } from "@/lib/mock/replies";
+import { agoToMs } from "@/lib/time";
 
 const TURN_GAP = 60_000; // 1 scripted minute per exchange
 
@@ -14,6 +15,8 @@ export type CustomerSession = {
   customerTyping: boolean;
   snapshots: TemperatureSnapshot[];
   liveSeq: number;
+  /** wall-clock arrival of the last customer message — drives the silence indicator */
+  lastCustomerAt: number | null;
 };
 
 type SessionStore = {
@@ -33,11 +36,16 @@ type SessionStore = {
 };
 
 function freshSession(customerId: string): CustomerSession {
+  const messages = initialMessages[customerId] ?? [];
+  const last = messages[messages.length - 1];
+  const ago = customers.find((c) => c.id === customerId)?.lastMessageAgo ?? "방금";
   return {
-    messages: initialMessages[customerId] ?? [],
+    messages,
     customerTyping: false,
     snapshots: [],
     liveSeq: 0,
+    // preloaded scripts end on a customer turn — anchor to the "N분 전" label
+    lastCustomerAt: last?.role === "customer" ? Date.now() - agoToMs(ago) : null,
   };
 }
 
@@ -74,6 +82,7 @@ export const useSessionStore = create<SessionStore>()((set, get) => {
                 customerTyping: false,
                 messages: [...session.messages, msg],
                 liveSeq: session.liveSeq + 1,
+                lastCustomerAt: Date.now(),
               },
             },
           };
