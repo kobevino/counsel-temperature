@@ -8,14 +8,14 @@
 ## 실행
 
 ```sh
-npm install
+pnpm install
 
 # 1) API 키 없이 데모 (결정적 mock 분석)
-TEMPERATURE_MOCK=1 npm run dev
+TEMPERATURE_MOCK=1 pnpm dev
 
 # 2) 실제 Claude 분석
 cp .env.example .env.local   # ANTHROPIC_API_KEY 입력
-npm run dev
+pnpm dev
 ```
 
 http://localhost:3000 접속. `ANTHROPIC_API_KEY`가 없으면 자동으로 mock 분석으로 동작한다.
