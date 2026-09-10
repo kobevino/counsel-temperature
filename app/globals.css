@@ -11,10 +11,16 @@
   --color-brand-soft: #eef0fb;
   --color-bubble-customer: #ffffff;
   --color-bubble-counselor: #e9ebfa;
-  --color-band-safe: #2fa47a;
-  --color-band-caution: #e5a93d;
-  --color-band-risk: #e8827c;
-  --color-band-urgent: #d64550;
+  /* status band fills — CVD + normal-vision separation validated */
+  --color-band-safe: #2f9e77;
+  --color-band-caution: #e8b93f;
+  --color-band-risk: #d95f3b;
+  --color-band-urgent: #a31f2e;
+  /* darker text-safe variants of the band colors */
+  --color-band-safe-text: #1d7a5f;
+  --color-band-caution-text: #a16207;
+  --color-band-risk-text: #b3401f;
+  --color-band-urgent-text: #a31f2e;
   --color-alert-bg: #fdeef0;
 }
 

@@ -26,8 +26,11 @@ type SessionStore = {
   sessions: Record<string, CustomerSession>;
   demoHints: boolean;
   draft: string;
+  /** message to flash-highlight when an evidence quote is clicked (transient) */
+  highlightId: string | null;
   selectCustomer: (id: string) => void;
   setDraft: (text: string) => void;
+  setHighlight: (id: string | null) => void;
   toggleDemoHints: () => void;
   sendCounselorMessage: (text: string) => void;
   chooseBranch: (option: BranchOption) => void;
@@ -96,9 +99,12 @@ export const useSessionStore = create<SessionStore>()(
         sessions: initialSessions(),
         demoHints: true,
         draft: "",
+        highlightId: null,
 
-        selectCustomer: (id) => set({ activeCustomerId: id, draft: "" }),
+        selectCustomer: (id) =>
+          set({ activeCustomerId: id, draft: "", highlightId: null }),
         setDraft: (text) => set({ draft: text }),
+        setHighlight: (id) => set({ highlightId: id }),
         toggleDemoHints: () => set((s) => ({ demoHints: !s.demoHints })),
 
         sendCounselorMessage: (text) => {

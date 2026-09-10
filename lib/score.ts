@@ -34,12 +34,32 @@ export function bandFromRisk(risk: number): Band {
 
 export const BAND_META: Record<
   Band,
-  { label: string; range: string; color: string }
+  { label: string; range: string; color: string; textColor: string }
 > = {
-  safe: { label: "안전", range: "0-29%", color: "var(--color-band-safe)" },
-  caution: { label: "주의", range: "30-49%", color: "var(--color-band-caution)" },
-  risk: { label: "위험", range: "50-69%", color: "var(--color-band-risk)" },
-  urgent: { label: "긴급", range: "70%+", color: "var(--color-band-urgent)" },
+  safe: {
+    label: "안전",
+    range: "0-29%",
+    color: "var(--color-band-safe)",
+    textColor: "var(--color-band-safe-text)",
+  },
+  caution: {
+    label: "주의",
+    range: "30-49%",
+    color: "var(--color-band-caution)",
+    textColor: "var(--color-band-caution-text)",
+  },
+  risk: {
+    label: "위험",
+    range: "50-69%",
+    color: "var(--color-band-risk)",
+    textColor: "var(--color-band-risk-text)",
+  },
+  urgent: {
+    label: "긴급",
+    range: "70%+",
+    color: "var(--color-band-urgent)",
+    textColor: "var(--color-band-urgent-text)",
+  },
 };
 
 export const BAND_ORDER: Band[] = ["safe", "caution", "risk", "urgent"];
