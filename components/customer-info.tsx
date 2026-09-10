@@ -12,7 +12,7 @@ export default function CustomerInfo({ customer }: { customer: Customer }) {
   ];
 
   return (
-    <aside className="flex h-full flex-col border-r border-line bg-surface">
+    <aside className="flex h-full flex-col bg-surface">
       <div className="border-b border-line px-4.5 py-6">
         <h2 className="text-[15px] font-bold">고객 정보</h2>
       </div>

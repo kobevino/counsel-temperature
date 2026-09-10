@@ -23,7 +23,7 @@ export default function CoachPanel({
     latest && turns >= MIN_CUSTOMER_MESSAGES && latest.confidence !== "low";
 
   return (
-    <aside className="flex h-full flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
+    <aside className="flex h-full min-h-0 flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-[11px] font-bold text-white">
