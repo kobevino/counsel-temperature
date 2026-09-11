@@ -2,9 +2,10 @@
 
 import { useActiveSession } from "@/store/session";
 import { customerTurn, MIN_CUSTOMER_MESSAGES } from "@/hooks/useTemperature";
-import RiskGauge from "./risk-gauge";
+import { evaluateInterventions } from "@/lib/intervention";
+import TemperatureGauge from "./temperature-gauge";
 import TrendChart from "./trend-chart";
-import CoachingAlert from "./coaching-alert";
+import InterventionCard from "./intervention-card";
 import EvidenceFooter from "./evidence-footer";
 
 export default function CoachPanel({
@@ -20,6 +21,10 @@ export default function CoachPanel({
   const latest = session.snapshots[session.snapshots.length - 1];
   const turns = customerTurn(session.messages);
   const showDetails = !!latest && turns >= MIN_CUSTOMER_MESSAGES;
+
+  // T1·T2·T3 트리거와 B1~B5 차단은 스냅샷 이력 전체에서 판단한다
+  const interventions = evaluateInterventions(session.snapshots);
+  const intervention = interventions[interventions.length - 1];
 
   return (
     <aside className="flex h-full min-h-0 flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
@@ -50,16 +55,18 @@ export default function CoachPanel({
         </div>
       </div>
 
-      <RiskGauge snapshot={latest} customerTurns={turns} />
+      <TemperatureGauge snapshot={latest} customerTurns={turns} />
 
-      <TrendChart snapshots={session.snapshots} />
+      <TrendChart snapshots={session.snapshots} interventions={interventions} />
 
-      {showDetails && <CoachingAlert snapshot={latest} />}
+      {showDetails && intervention && (
+        <InterventionCard snapshot={latest} intervention={intervention} />
+      )}
 
       {isError && (
         <button
           onClick={onReanalyze}
-          className="rounded-lg border border-band-urgent/40 bg-alert-bg px-3 py-2 text-[12px] font-semibold text-band-urgent-text"
+          className="rounded-lg border border-band-imminent/40 bg-alert-bg px-3 py-2 text-[12px] font-semibold text-band-imminent-text"
         >
           분석에 실패했습니다 — 다시 분석
         </button>

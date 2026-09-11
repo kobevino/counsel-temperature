@@ -248,14 +248,14 @@ export const useSessionStore = create<SessionStore>()((set, get) => {
       set((s) => {
         const session = s.sessions[customerId];
         if (!session) return s;
-        // dedupe: keep one snapshot per turn (latest wins)
-        const kept = session.snapshots.filter((x) => x.turn !== snapshot.turn);
+        // dedupe by 판정 시점(seq) — 무응답 구간은 턴이 같아도 다른 판정이다
+        const kept = session.snapshots.filter((x) => x.seq !== snapshot.seq);
         return {
           sessions: {
             ...s.sessions,
             [customerId]: {
               ...session,
-              snapshots: [...kept, snapshot].sort((a, b) => a.turn - b.turn),
+              snapshots: [...kept, snapshot].sort((a, b) => a.seq - b.seq),
             },
           },
         };

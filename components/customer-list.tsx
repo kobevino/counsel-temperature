@@ -55,7 +55,7 @@ export default function CustomerList() {
           const session = sessions[c.id];
           // preview tracks the live thread — no scripted ending shown up front
           const preview = session?.messages.at(-1)?.text ?? c.lastMessage;
-          // risk badge only exists once the analysis has actually run
+          // 온도 배지는 분석이 실제로 돌아간 뒤에만 붙는다
           const snapshot = session?.snapshots.at(-1);
           return (
             <button
@@ -83,7 +83,7 @@ export default function CustomerList() {
                     className="mt-1.5 block text-[11px] font-semibold"
                     style={{ color: BAND_META[snapshot.band].textColor }}
                   >
-                    이탈 확률 {snapshot.risk}%
+                    {BAND_META[snapshot.band].label} {snapshot.temperature}°
                   </span>
                 )}
               </span>

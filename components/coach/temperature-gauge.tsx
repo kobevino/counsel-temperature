@@ -2,8 +2,9 @@
 
 import type { TemperatureSnapshot } from "@/lib/types";
 import { BAND_META, BAND_ORDER } from "@/lib/score";
+import { formatElapsed } from "@/lib/time";
 
-export default function RiskGauge({
+export default function TemperatureGauge({
   snapshot,
   customerTurns,
 }: {
@@ -14,13 +15,18 @@ export default function RiskGauge({
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
-      <p className="text-[12px] text-ink-soft">현재 이탈 확률</p>
+      <div className="flex items-baseline justify-between">
+        <p className="text-[12px] text-ink-soft">현재 대화 온도</p>
+        {!insufficient && snapshot.silenceMinutes > 0 && (
+          <p className="text-[11px] text-ink-faint">
+            무응답 {formatElapsed(snapshot.silenceMinutes)} · 야간 제외
+          </p>
+        )}
+      </div>
 
       {insufficient ? (
         <div className="mt-2">
-          <p className="text-[15px] font-semibold text-ink-faint">
-            분석 대기 중
-          </p>
+          <p className="text-[15px] font-semibold text-ink-faint">분석 대기 중</p>
           <p className="mt-0.5 text-[12px] text-ink-faint">
             고객 발화 {customerTurns}개 — 첫 분석 결과를 기다리고 있습니다.
           </p>
@@ -31,7 +37,8 @@ export default function RiskGauge({
             className="text-4xl font-bold tabular-nums"
             style={{ color: BAND_META[snapshot.band].textColor }}
           >
-            {snapshot.risk}%
+            {snapshot.temperature}
+            <span className="ml-0.5 text-xl">°</span>
           </span>
           <span className="flex flex-col items-end gap-1">
             <span

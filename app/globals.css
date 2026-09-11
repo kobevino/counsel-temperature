@@ -11,17 +11,20 @@
   --color-brand-soft: #eef0fb;
   --color-bubble-customer: #ffffff;
   --color-bubble-counselor: #e9ebfa;
-  /* status band fills — CVD + normal-vision separation validated */
-  --color-band-safe: #2f9e77;
-  --color-band-caution: #e8b93f;
-  --color-band-risk: #d95f3b;
-  --color-band-urgent: #a31f2e;
+  /* 온도 구간 — 차가운 쪽에서 따뜻한 쪽으로. CVD + normal-vision separation validated */
+  --color-band-imminent: #a31f2e;
+  --color-band-cold: #d95f3b;
+  --color-band-cooling: #e8b93f;
+  --color-band-lukewarm: #4f83d9;
+  --color-band-warm: #2f9e77;
   /* darker text-safe variants of the band colors */
-  --color-band-safe-text: #1d7a5f;
-  --color-band-caution-text: #a16207;
-  --color-band-risk-text: #b3401f;
-  --color-band-urgent-text: #a31f2e;
+  --color-band-imminent-text: #a31f2e;
+  --color-band-cold-text: #b3401f;
+  --color-band-cooling-text: #a16207;
+  --color-band-lukewarm-text: #2f61ad;
+  --color-band-warm-text: #1d7a5f;
   --color-alert-bg: #fdeef0;
+  --color-ops-bg: #f3f4f6;
 }
 
 html,
