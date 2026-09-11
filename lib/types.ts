@@ -30,7 +30,6 @@ export type Customer = {
   lastMessageAgo: string;
   status: CustomerStatus;
   counselor: string;
-  riskLabel?: string;
 };
 
 // ---------- Temperature analysis ----------

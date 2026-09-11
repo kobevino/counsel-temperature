@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import type { Customer, Message } from "@/lib/types";
 import { formatClock, formatDateLabel } from "@/lib/time";
 import { useSessionStore } from "@/store/session";
-import SilenceIndicator from "./silence-indicator";
 
 const NEAR_BOTTOM_PX = 80;
 
@@ -12,12 +11,10 @@ export default function MessageList({
   customer,
   messages,
   customerTyping,
-  lastCustomerAt,
 }: {
   customer: Customer;
   messages: Message[];
   customerTyping: boolean;
-  lastCustomerAt: number | null;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const nearBottomRef = useRef(true);
@@ -99,11 +96,6 @@ export default function MessageList({
               </div>
             );
           })}
-          <SilenceIndicator
-            messages={messages}
-            customerTyping={customerTyping}
-            lastCustomerAt={lastCustomerAt}
-          />
           {customerTyping && (
             <div className="flex items-start">
               <div className="flex gap-1 rounded-2xl rounded-bl-md bg-bubble-customer px-4 py-3.5 shadow-[0_1px_2px_rgba(20,24,40,0.05)]">

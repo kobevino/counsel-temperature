@@ -71,7 +71,7 @@ export function useTemperature() {
   useEffect(() => {
     if (!lastCustomerMsgId) return;
     if (customerTurn(session.messages) < MIN_CUSTOMER_MESSAGES) return;
-    const key = `${activeCustomerId}:${lastCustomerMsgId}`;
+    const key = `${activeCustomerId}:${session.epoch}:${lastCustomerMsgId}`;
     if (analyzedKeyRef.current === key) return;
     // skip if this turn is already covered by a persisted snapshot
     const turn = customerTurn(session.messages);
@@ -85,7 +85,14 @@ export function useTemperature() {
       messages: session.messages,
       previousSnapshot: session.snapshots[session.snapshots.length - 1],
     });
-  }, [activeCustomerId, lastCustomerMsgId, session.messages, session.snapshots, run]);
+  }, [
+    activeCustomerId,
+    lastCustomerMsgId,
+    session.epoch,
+    session.messages,
+    session.snapshots,
+    run,
+  ]);
 
   const reanalyze = useCallback(() => {
     if (customerTurn(session.messages) < MIN_CUSTOMER_MESSAGES) return;

@@ -3,13 +3,14 @@
 import { customers } from "@/lib/mock/customers";
 import { useSessionStore } from "@/store/session";
 import { SearchIcon } from "@/components/icons";
-import { riskFromTemperature } from "@/lib/score";
+import { BAND_META } from "@/lib/score";
 
 const AVATAR_COLORS: Record<string, string> = {
+  jung: "bg-emerald-200",
+  han: "bg-indigo-200",
   park: "bg-amber-400",
-  kim: "bg-indigo-200",
-  lee: "bg-emerald-200",
   choi: "bg-rose-200",
+  oh: "bg-sky-200",
 };
 
 const STATUS_TABS = ["접수", "문의", "응대", "종료"] as const;
@@ -51,10 +52,11 @@ export default function CustomerList() {
       <div className="flex-1 overflow-y-auto">
         {customers.map((c) => {
           const active = c.id === activeCustomerId;
-          const latestSnapshot = sessions[c.id]?.snapshots.at(-1);
-          const risk = latestSnapshot
-            ? riskFromTemperature(latestSnapshot.temperature)
-            : null;
+          const session = sessions[c.id];
+          // preview tracks the live thread — no scripted ending shown up front
+          const preview = session?.messages.at(-1)?.text ?? c.lastMessage;
+          // risk badge only exists once the analysis has actually run
+          const snapshot = session?.snapshots.at(-1);
           return (
             <button
               key={c.id}
@@ -74,12 +76,14 @@ export default function CustomerList() {
                   <span className="text-[11px] text-ink-faint">{c.lastMessageAgo}</span>
                 </span>
                 <span className="mt-1 block truncate text-[13px] text-ink-soft">
-                  {c.lastMessage}
+                  {preview}
                 </span>
-                {c.riskLabel && (
-                  <span className="mt-1.5 block text-[11px] font-semibold text-band-urgent">
-                    {c.riskLabel}
-                    {risk !== null ? ` ${risk}%` : ""}
+                {snapshot && (
+                  <span
+                    className="mt-1.5 block text-[11px] font-semibold"
+                    style={{ color: BAND_META[snapshot.band].textColor }}
+                  >
+                    이탈 확률 {snapshot.risk}%
                   </span>
                 )}
               </span>

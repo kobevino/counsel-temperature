@@ -30,14 +30,24 @@ export default function CoachPanel({
           </span>
           <h2 className="text-[15px] font-bold">대화 온도계</h2>
         </div>
-        <span className="flex items-center gap-1.5 text-[11px] text-emerald-600">
-          <span
-            className={`h-1.5 w-1.5 rounded-full bg-emerald-500 ${
-              isAnalyzing ? "animate-ping" : ""
-            }`}
-          />
-          {isAnalyzing ? "분석 중" : "실시간 분석"}
-        </span>
+        <div className="flex items-center gap-2">
+          {/* 고객이 답이 없어 자동 트리거가 돌지 않을 때 수동으로 다시 읽힌다 */}
+          <button
+            onClick={onReanalyze}
+            disabled={isAnalyzing || turns < MIN_CUSTOMER_MESSAGES}
+            className="rounded-md border border-line px-2 py-1 text-[11px] text-ink-faint transition-colors hover:border-brand/40 hover:text-brand disabled:opacity-40"
+          >
+            다시 분석
+          </button>
+          <span className="flex items-center gap-1.5 text-[11px] text-emerald-600">
+            <span
+              className={`h-1.5 w-1.5 rounded-full bg-emerald-500 ${
+                isAnalyzing ? "animate-ping" : ""
+              }`}
+            />
+            {isAnalyzing ? "분석 중" : "실시간 분석"}
+          </span>
+        </div>
       </div>
 
       <RiskGauge snapshot={latest} customerTurns={turns} />
