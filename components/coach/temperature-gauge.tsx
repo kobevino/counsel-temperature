@@ -1,9 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import type { TemperatureSnapshot } from "@/lib/types";
 import { BAND_META, BAND_ORDER } from "@/lib/score";
 import { formatElapsed } from "@/lib/time";
 
+/** 카드를 클릭하면 온도 계산 기준 가이드가 새 탭으로 열린다 */
 export default function TemperatureGauge({
   snapshot,
   customerTurns,
@@ -14,14 +16,24 @@ export default function TemperatureGauge({
   const insufficient = !snapshot;
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
+    <Link
+      href="/temperature-guide"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group block rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)] transition-colors hover:border-brand/40"
+    >
       <div className="flex items-baseline justify-between">
         <p className="text-[12px] text-ink-soft">현재 대화 온도</p>
-        {!insufficient && snapshot.silenceMinutes > 0 && (
-          <p className="text-[11px] text-ink-faint">
-            무응답 {formatElapsed(snapshot.silenceMinutes)} · 야간 제외
-          </p>
-        )}
+        <span className="flex items-baseline gap-2">
+          {!insufficient && snapshot.silenceMinutes > 0 && (
+            <span className="text-[11px] text-ink-faint">
+              무응답 {formatElapsed(snapshot.silenceMinutes)} · 야간 제외
+            </span>
+          )}
+          <span className="text-[11px] text-ink-faint transition-colors group-hover:text-brand">
+            계산 기준 ↗
+          </span>
+        </span>
       </div>
 
       {insufficient ? (
@@ -79,6 +91,6 @@ export default function TemperatureGauge({
           );
         })}
       </div>
-    </div>
+    </Link>
   );
 }
