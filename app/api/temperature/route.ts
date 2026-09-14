@@ -129,13 +129,19 @@ function toSnapshot(
   const baseline = reading.openingTone === "wary" ? WARY_AXES : INITIAL_AXES;
   const { axes: scores, contributions } = applyDetections(kept, baseline);
 
-  const signals: ResolvedSignal[] = contributions.map((c) => ({
-    code: c.code,
-    label: c.label,
-    quote: c.quote,
-    messageId: c.quote ? (quoteIds.get(c.quote) ?? null) : null,
-    effects: c.effects,
-  }));
+  const atById = new Map(messages.map((m) => [m.id, m.at]));
+  const lastAt = messages[messages.length - 1]?.at ?? 0;
+  const signals: ResolvedSignal[] = contributions.map((c) => {
+    const messageId = c.quote ? (quoteIds.get(c.quote) ?? null) : null;
+    return {
+      code: c.code,
+      label: c.label,
+      quote: c.quote,
+      messageId,
+      at: messageId ? (atById.get(messageId) ?? lastAt) : lastAt,
+      effects: c.effects,
+    };
+  });
 
   // 직전 판정 이후 새로 잡힌 신호만 — B5 판정과 "이번 턴 근거"에 쓴다
   const before = new Set((previous?.signals ?? []).map(key));

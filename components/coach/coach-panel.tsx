@@ -1,6 +1,7 @@
 "use client";
 
-import { useActiveSession } from "@/store/session";
+import { useActiveSession, useSessionStore } from "@/store/session";
+import { customers } from "@/lib/mock/customers";
 import { customerTurn, MIN_CUSTOMER_MESSAGES } from "@/hooks/useTemperature";
 import { evaluateInterventions } from "@/lib/intervention";
 import TemperatureGauge from "./temperature-gauge";
@@ -19,6 +20,9 @@ export default function CoachPanel({
   onReanalyze: () => void;
 }) {
   const session = useActiveSession();
+  const activeCustomerId = useSessionStore((s) => s.activeCustomerId);
+  const customer =
+    customers.find((c) => c.id === activeCustomerId) ?? customers[0];
   const latest = session.snapshots[session.snapshots.length - 1];
   const turns = customerTurn(session.messages);
   const showDetails = !!latest && turns >= MIN_CUSTOMER_MESSAGES;
@@ -60,7 +64,7 @@ export default function CoachPanel({
 
       <TrendChart snapshots={session.snapshots} interventions={interventions} />
 
-      <DetectedSignals snapshot={latest} />
+      <DetectedSignals snapshot={latest} startedAt={customer.startedAt} />
 
       {showDetails && intervention && (
         <InterventionCard snapshot={latest} intervention={intervention} />

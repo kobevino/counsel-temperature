@@ -74,6 +74,8 @@ export type ResolvedSignal = {
   label: string;
   quote: string;
   messageId: string | null;
+  /** 근거 발화의 오프셋(ms). 무응답 신호는 판정 시점(마지막 메시지) 기준 */
+  at: number;
   effects: AxisEffects;
 };
 

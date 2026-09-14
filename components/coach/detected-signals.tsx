@@ -3,16 +3,20 @@
 import Link from "next/link";
 import type { TemperatureSnapshot } from "@/lib/types";
 import { isPositiveSignal } from "@/lib/signals";
+import { formatClock } from "@/lib/time";
 
 /**
  * 대화 전체에서 누적 감지된 신호 목록. 번호는 감지 순서이며
  * 말풍선의 "위험 신호 N" 뱃지와 같은 체계를 쓴다.
+ * 같은 신호가 반복 감지될 수 있어 발생 시각으로 구분한다.
  * 카드를 클릭하면 이탈사유 TOP 30 참조 페이지가 새 탭으로 열린다.
  */
 export default function DetectedSignals({
   snapshot,
+  startedAt,
 }: {
   snapshot: TemperatureSnapshot | undefined;
+  startedAt: string;
 }) {
   const signals = snapshot?.signals ?? [];
 
@@ -55,6 +59,11 @@ export default function DetectedSignals({
                 <span className="text-[12px] font-medium leading-snug">
                   {signal.label}
                 </span>
+                {typeof signal.at === "number" && (
+                  <span className="ml-auto shrink-0 text-[11px] tabular-nums text-ink-faint">
+                    {formatClock(startedAt, signal.at)}
+                  </span>
+                )}
               </li>
             );
           })}
