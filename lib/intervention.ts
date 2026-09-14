@@ -8,11 +8,16 @@ import { SERVICE_FAULT_CODES, type AxisEffects } from "@/lib/signals";
  *   T1 온도 ≤ 39            절대 수준 (차가움 진입)
  *   T2 한 턴 하락폭 ≥ 8     속도. 온도가 높아도 급락은 위험
  *   T3 최근 3턴 하락 합 ≥ 12 누적. 조용히 식는 걸 잡음
+ *
+ * 카드(T1~T3) 미달이어도 한 턴 −4 / 3턴 −6부터는 L1 힌트(문구만 회색 한 줄)를 띄운다.
  */
 export const T1_TEMPERATURE = 39;
 export const T2_TURN_DROP = 8;
 export const T3_WINDOW_DROP = 12;
-/** B1 — 직전 몇 턴 안에 이미 개입했으면 다시 울리지 않는다 (피로도 관리) */
+/** L1 힌트 — 카드(T2·T3)에는 못 미치는 완만한 하락. 회색 한 줄만 띄운다 */
+export const L1_TURN_DROP = 4;
+export const L1_WINDOW_DROP = 6;
+/** B1 — 직전 몇 턴 안에 이미 개입했으면 카드를 다시 띄우지 않는다 (L1 힌트로 강등) */
 export const B1_COOLDOWN_TURNS = 3;
 
 export type TriggerCode = "T1" | "T2" | "T3";
@@ -21,7 +26,9 @@ export type BlockCode = "B1" | "B2" | "B3" | "B4" | "B5";
 export type InterventionMode =
   /** 트리거 미달 — 아무것도 띄우지 않는다 */
   | "none"
-  /** 개입 카드 + 처방 */
+  /** L1 — 카드 미달의 완만한 하락. 문구만 회색 한 줄로 */
+  | "hint"
+  /** L2 개입 카드 — 문구 + 근거 + 금지 */
   | "card"
   /** B5 — 하락이 상담사 귀책이라 고객 처방 대신 운영 알림 */
   | "ops"
@@ -32,11 +39,13 @@ export type InterventionMode =
 
 export type Prescription = {
   axis: AxisKey;
-  diagnosis: string;
-  action: string;
-  /** 개입 카드 버튼 라벨 */
-  label: string;
-  /** 버튼을 누르면 입력창에 들어가는 문장 */
+  /** 💡 문구 — 동사형 명사구 20자 이내. 대사가 아니라 제시할 정보 항목 */
+  phrase: string;
+  /** 근거 — 왜 떨어졌는지 1줄 (축 이름·숫자는 렌더링에서 dominant와 결합) */
+  reason: string;
+  /** ✕ 금지 — 지금 하면 안 되는 것 1줄 */
+  forbid: string;
+  /** 버튼을 누르면 입력창에 들어가는 초안 — 카드에는 표시하지 않는다 */
   draft: string;
 };
 
@@ -44,33 +53,33 @@ export type Prescription = {
 export const PRESCRIPTIONS: Record<AxisKey, Prescription> = {
   intent: {
     axis: "intent",
-    diagnosis: "상품·금액이 안 맞습니다",
-    action: "보장을 조정한 대안을 제시하세요.",
-    label: "대안 설계 제시",
+    phrase: "보장 하향 2안 제시",
+    reason: "상품·금액이 안 맞습니다 — 설득이 아니라 설계 문제",
+    forbid: "같은 안 재설명 · 보장 필요성 강조",
     draft:
-      "보장을 조금 조정한 안으로도 보여드릴 수 있어요. 비교해서 보내드릴까요?",
+      "보장을 조정한 안 두 가지로도 보여드릴 수 있어요. 비교해서 보내드릴까요?",
   },
   engagement: {
     axis: "engagement",
-    diagnosis: "관심이 떠났거나 시간이 지났습니다",
-    action: "지금까지 내용을 요약하고 종료 예고를 1회만 보내세요. 압박은 금지입니다.",
-    label: "요약 + 종료 예고",
+    phrase: "요약 1회 발송 + 종료 예고",
+    reason: "상품 거부가 아니라 대화에서 멀어진 상태",
+    forbid: "재문의 알림톡 반복 · “결정하셨나요?” 재촉",
     draft:
       "여기까지 내용 정리해서 보내드릴게요. 천천히 보시고 필요하실 때 말씀해주세요.",
   },
   trust: {
     axis: "trust",
-    diagnosis: "정보 요구가 과했거나 불신이 생겼습니다",
-    action: "정보 요구를 멈추고 수집 목적을 설명한 뒤 개략 금액을 먼저 안내하세요.",
-    label: "개략 금액 먼저",
+    phrase: "정보 요구 중단 → 개략 금액 먼저",
+    reason: "정보 요구가 과했습니다 — 답을 먼저 줘야 돌아옵니다",
+    forbid: "“정확한 견적을 위해 필요합니다” · 추가 정보 요구 전부",
     draft:
       "정보 없이 먼저 알려드릴게요. 조건에 따라 다르지만 대략적인 금액대는 이 정도입니다.",
   },
   resistance: {
     axis: "resistance",
-    diagnosis: "가격·타이밍 저항입니다",
-    action: '보장을 낮춘 안을 제시하고 "결정 기한 없습니다"를 명시하세요.',
-    label: "낮춘 안 제시",
+    phrase: "낮춘 안 + 기한 없음 명시",
+    reason: "못 믿어서가 아니라 부담돼서 멈춘 상태",
+    forbid: "보장 필요성 재설명 · “지금 아니면 인상” 마감 압박",
     draft:
       "보장을 낮춘 안으로 먼저 보여드릴게요. 결정 기한은 없으니 편하게 보셔도 됩니다.",
   },
@@ -193,13 +202,11 @@ export function evaluateInterventions(
     if (turnDrop >= T2_TURN_DROP) triggers.push("T2");
     if (windowDrop >= T3_WINDOW_DROP) triggers.push("T3");
 
-    if (triggers.length === 0) {
-      decisions.push(NONE);
-      continue;
-    }
-
     // 하락 폭이 가장 넓은 구간을 기준으로 주도 축을 고른다
-    const base = triggers.includes("T3") ? windowBase : previous;
+    const base =
+      triggers.includes("T3") || (triggers.length === 0 && windowDrop >= L1_WINDOW_DROP)
+        ? windowBase
+        : previous;
     const dominant =
       dominantAxis(base ? axisScores(base) : INITIAL_AXES, axisScores(current)) ??
       dominantAxis(INITIAL_AXES, axisScores(current));
@@ -215,11 +222,24 @@ export function evaluateInterventions(
       triggers,
       blockedBy,
       dominant,
-      prescription: mode === "card" ? prescription : null,
+      prescription: mode === "card" || mode === "hint" ? prescription : null,
       turnDrop,
       windowDrop,
       reason,
     });
+
+    if (triggers.length === 0) {
+      // L1 힌트 — 카드 기준엔 못 미치는 완만한 하락. 거절 이후엔 힌트도 소음이다.
+      const gentleDrop = turnDrop >= L1_TURN_DROP || windowDrop >= L1_WINDOW_DROP;
+      if (gentleDrop && rejectedFrom === null && dominant) {
+        const drop =
+          turnDrop >= L1_TURN_DROP ? `한 턴 −${turnDrop}` : `3턴 −${windowDrop}`;
+        decisions.push(decide("hint", null, drop));
+      } else {
+        decisions.push(NONE);
+      }
+      continue;
+    }
 
     // B2 — 명시적 거절 이후에는 처방을 내지 않는다. 재접근은 컴플레인이 된다.
     if (rejectedFrom !== null) {
@@ -229,13 +249,13 @@ export function evaluateInterventions(
       continue;
     }
 
-    // B1 — 직전 3턴 내 이미 개입
+    // B1 — 직전 3턴 내 이미 개입. 카드는 금지되지만 L1 힌트는 허용 (피로도 관리)
     const recentlyFired = decisions
       .slice(Math.max(0, i - B1_COOLDOWN_TURNS), i)
       .some((d) => d.mode === "card" || d.mode === "ops");
     if (recentlyFired) {
       decisions.push(
-        decide("hold", "B1", `${detail} — 직전 개입 직후라 알림을 보류합니다.`),
+        decide("hint", "B1", `${detail} — 직전 개입 직후라 힌트로 낮춥니다.`),
       );
       continue;
     }
@@ -259,10 +279,10 @@ export function evaluateInterventions(
       continue;
     }
 
-    // B5 — 하락 요인의 과반이 상담사 귀책이면 고객 처방이 아니라 운영 알림
+    // B5 — 하락 요인의 과반이 상담사 귀책이면 고객 카드를 억제하고 운영 알림
     if (serviceFaultDominates(current)) {
       decisions.push(
-        decide("ops", "B5", `${detail} — 하락의 과반이 응답 지연·설명 반복입니다.`),
+        decide("ops", "B5", `${detail} — 하락의 과반이 상담사 귀책(응답 지연·설명 반복)입니다.`),
       );
       continue;
     }
