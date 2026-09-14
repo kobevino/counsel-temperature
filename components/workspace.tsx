@@ -8,7 +8,7 @@ import CustomerList from "@/components/customer-list";
 import ChatPanel from "@/components/chat/chat-panel";
 import CustomerInfo from "@/components/customer-info";
 import CoachPanel from "@/components/coach/coach-panel";
-import { ChatThermometerIcon } from "@/components/icons";
+import { ThermometerLottie } from "@/components/coach/thermometer-loading";
 
 export default function Workspace() {
   const [coachOpen, setCoachOpen] = useState(true);
@@ -39,7 +39,11 @@ export default function Workspace() {
         aria-label={coachOpen ? "시그널 온도계 닫기" : "시그널 온도계 열기"}
         className="fixed right-6 bottom-6 z-50 flex h-13 w-13 items-center justify-center rounded-full bg-brand text-[15px] font-bold text-white shadow-lg transition-transform hover:scale-105"
       >
-        {coachOpen ? "✕" : <ChatThermometerIcon className="h-6 w-6" />}
+        {coachOpen ? (
+          "✕"
+        ) : (
+          <ThermometerLottie playing={false} className="h-11 w-11" />
+        )}
       </button>
     </main>
   );
