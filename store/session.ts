@@ -57,9 +57,26 @@ function initialSessions(): Record<string, CustomerSession> {
   return Object.fromEntries(customers.map((c) => [c.id, freshSession(c.id)]));
 }
 
+/**
+ * 고객별 응답 텀 고정값(ms). 여기 없는 고객은 글자 수 기반 타이핑 시간을 쓴다.
+ * 박준호는 답이 너무 즉각적이라 10초 텀으로 늦춰 둔다.
+ */
+const REPLY_DELAY: Record<string, number> = {
+  park: 10_000,
+};
+
+/** 고객별 텀을 건너뛰고 바로 내려보내는 대본 메시지 */
+const INSTANT_REPLIES = new Set(["park-m3"]);
+
 /** minimum on-screen typing time so replies don't pop in instantly */
-function typingDelay(text: string): number {
-  return Math.min(2500, 600 + text.length * 25);
+function typingDelay(
+  customerId: string,
+  text: string,
+  messageId?: string,
+): number {
+  const natural = Math.min(2500, 600 + text.length * 25);
+  if (messageId && INSTANT_REPLIES.has(messageId)) return natural;
+  return REPLY_DELAY[customerId] ?? natural;
 }
 
 /** the counselor line the script expects next, "" when it's not their turn */
@@ -138,7 +155,7 @@ export const useSessionStore = create<SessionStore>()((set, get) => {
       timers.delete(customerId);
       appendCustomerMessage(customerId, next.text, next);
       playCustomerRun(customerId);
-    }, typingDelay(next.text));
+    }, typingDelay(customerId, next.text, next.id));
     timers.set(customerId, timer);
   };
 
@@ -233,7 +250,7 @@ export const useSessionStore = create<SessionStore>()((set, get) => {
         .then((text) => {
           const remaining = Math.max(
             0,
-            typingDelay(text) - (Date.now() - startedAt),
+            typingDelay(customerId, text) - (Date.now() - startedAt),
           );
           const timer = setTimeout(() => {
             timers.delete(customerId);
