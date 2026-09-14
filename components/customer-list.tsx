@@ -22,12 +22,7 @@ export default function CustomerList() {
   return (
     <aside className="flex h-full flex-col border-r border-line bg-surface">
       <div className="border-b border-line px-4 pb-4 pt-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-bold">채팅상담</h1>
-          <span className="flex h-5 w-6 items-center justify-center rounded-full bg-brand text-[11px] font-semibold text-white">
-            {customers.length + 2}
-          </span>
-        </div>
+        <h1 className="text-lg font-bold">채팅상담</h1>
         <div className="mt-4 flex justify-between text-[13px]">
           {STATUS_TABS.map((tab) => (
             <button
