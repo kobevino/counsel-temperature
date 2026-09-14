@@ -34,8 +34,8 @@ export default function CoachPanel({
 
   return (
     <aside className="relative flex h-full min-h-0 flex-col">
-      {/* 첫 분석 중에는 패널 위를 dim 처리하고 온도계 로딩을 띄운다 */}
-      {isAnalyzing && !latest && <ThermometerLoading />}
+      {/* 분석이 도는 동안 패널 위를 dim 처리하고 온도계 로딩을 띄운다 */}
+      {isAnalyzing && <ThermometerLoading />}
 
       <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
         <div className="flex items-center justify-between">

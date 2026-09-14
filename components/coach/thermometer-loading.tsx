@@ -39,7 +39,7 @@ export function ThermometerLottie({
   return <div ref={container} className={className} />;
 }
 
-/** 첫 온도 분석이 도는 동안 패널을 dim 처리하고 위에 뜨는 로딩 오버레이 */
+/** 온도 분석이 도는 동안 패널을 dim 처리하고 위에 뜨는 로딩 오버레이 */
 export default function ThermometerLoading() {
   return (
     <div
