@@ -39,16 +39,16 @@ export function ThermometerLottie({
   return <div ref={container} className={className} />;
 }
 
-/** 첫 온도 분석이 도는 동안 패널 본문을 대신하는 로딩 카드 */
+/** 첫 온도 분석이 도는 동안 패널을 dim 처리하고 위에 뜨는 로딩 오버레이 */
 export default function ThermometerLoading() {
   return (
     <div
       role="status"
       aria-label="대화 온도 분석 중"
-      className="flex flex-1 flex-col items-center justify-center gap-1 rounded-2xl border border-line bg-surface p-6 shadow-[0_1px_3px_rgba(20,24,40,0.06)]"
+      className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-1 bg-ink/45 backdrop-blur-[2px]"
     >
       <ThermometerLottie className="h-44 w-44" />
-      <p className="text-[13px] font-semibold text-ink-soft">
+      <p className="text-[13px] font-semibold text-white">
         대화 온도를 분석하고 있습니다
       </p>
     </div>
