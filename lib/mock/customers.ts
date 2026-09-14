@@ -15,7 +15,7 @@ export const customers: Customer[] = [
     channel: "홈페이지",
     startedAt: "16:10",
     tags: ["신규 고객", "치아보험", "홈페이지 유입"],
-    lastMessage: "치아보험 임플란트 보장되나요?",
+    lastMessage: "치아보험 임플란트도 보장되는지 궁금해서요",
     lastMessageAgo: "방금",
     status: "문의",
     counselor: "김소연",

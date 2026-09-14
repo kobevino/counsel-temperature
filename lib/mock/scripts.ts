@@ -17,50 +17,54 @@ export function openingCount(script: Message[]): number {
  * 오프셋(ms)이라 재생이 항상 동일하다. 대본이 끝난 뒤부터는 페르소나 응답
  * 엔진(/api/customer-reply)이 고객을 이어서 연기한다.
  *
- * jung(A) 긍정 — 순조로운 전환
+ * jung(A) 긍정 — 면책기간에 잠깐 식었다가 즉답으로 회복, 전환
  * han(B)  긍정 — 가격 저항 후 대안으로 전환
  * park(C) 위기→회복 — 상담사 무응답으로 급락, B5 운영 알림 → 재배정 후 회복
  * choi(D) 이탈 — 답변 지연 (고객 발화는 13:44가 마지막, 이후 상담사만 발화)
  */
 export const initialMessages: Record<string, Message[]> = {
-  // A. 치아보험 · 40대 여 — 16:10 시작
+  // A. 치아보험 · 40대 여 — 16:10 시작. 면책 2년에 잠깐 식었다가(▼) 즉답으로 회복.
   jung: [
-    { id: "jung-m1", role: "customer", text: "치아보험 임플란트 보장되나요?", at: 0 },
-    { id: "jung-m2", role: "counselor", text: "네, 개당 최대 150만원까지 보장됩니다.", at: 0 },
-    { id: "jung-m3", role: "customer", text: "좋네요 몇 개까지 되나요", at: 2 * MIN },
+    {
+      id: "jung-m1",
+      role: "customer",
+      text: "치아보험 임플란트도 보장되는지 궁금해서요",
+      at: 0,
+    },
+    {
+      id: "jung-m2",
+      role: "counselor",
+      text: "네, 임플란트는 개당 최대 150만원, 연간 3개까지 보장됩니다. 면책기간은 2년이에요.",
+      at: 1 * MIN,
+    },
+    { id: "jung-m3", role: "customer", text: "2년은 좀 기네요", at: 3 * MIN },
     {
       id: "jung-m4",
       role: "counselor",
-      text: "연간 3개까지 가능하고 면책기간은 2년입니다.",
-      at: 3 * MIN,
+      text: "면책 2년은 임플란트만이고, 충치·크라운은 가입 다음 날부터 바로 보장됩니다.",
+      at: 4 * MIN,
     },
     {
       id: "jung-m5",
-      role: "customer",
-      text: "2년은 좀 기네요 근데 어차피 미리 드는 거니까",
-      at: 5 * MIN,
+      role: "counselor",
+      text: "40대 여성 기준 월 2만 4천원이에요.",
+      at: 4 * MIN,
     },
     {
       id: "jung-m6",
-      role: "counselor",
-      text: "맞습니다. 지금 가입하시면 2028년부터 보장돼요.",
+      role: "customer",
+      text: "아 그건 몰랐네요 어차피 미리 드는 거니까",
       at: 6 * MIN,
     },
-    { id: "jung-m7", role: "customer", text: "보험료는 얼마예요?", at: 7 * MIN },
     {
-      id: "jung-m8",
+      id: "jung-m7",
       role: "counselor",
-      text: "40대 여성 기준 월 2만 4천원입니다.",
+      text: "네, 지금 가입하시면 2028년부터 임플란트도 보장돼요.",
       at: 7 * MIN,
     },
-    {
-      id: "jung-m9",
-      role: "customer",
-      text: "네 그럼 가입할게요 어떻게 하면 되나요",
-      at: 9 * MIN,
-    },
-    { id: "jung-m10", role: "counselor", text: "정보 입력 도와드릴게요!", at: 9 * MIN },
-    { id: "jung-m11", role: "customer", text: "넵 바로 할게요", at: 10 * MIN },
+    { id: "jung-m8", role: "customer", text: "그럼 어떻게 하면 되나요", at: 8 * MIN },
+    { id: "jung-m9", role: "counselor", text: "정보 입력 도와드릴게요!", at: 8 * MIN },
+    { id: "jung-m10", role: "customer", text: "넵 바로 할게요", at: 9 * MIN },
   ],
 
   // B. 3대진단비 · 50대 여 — 10:22 시작
