@@ -25,10 +25,13 @@ export default function DetectedSignals({
   const [expanded, setExpanded] = useState(false);
 
   const signals = snapshot?.signals ?? [];
-  // 최근 감지된 신호가 위로 오도록 정렬. 번호(order)는 감지 순서를 유지한다.
+  // 최근 감지된 신호가 위로 오도록 정렬. 번호(order)는 감지 순서를 유지하며,
+  // 같은 시각에 감지된 신호끼리도 나중에 감지된 것이 위로 온다.
   const sorted = signals
     .map((signal, order) => ({ signal, order }))
-    .sort((a, b) => (b.signal.at ?? 0) - (a.signal.at ?? 0));
+    .sort(
+      (a, b) => (b.signal.at ?? 0) - (a.signal.at ?? 0) || b.order - a.order,
+    );
   // 기본으로는 최근 신호만 보여주고 나머지는 [더보기]로 펼친다.
   const visible = expanded ? sorted : sorted.slice(0, RECENT_COUNT);
   const hiddenCount = sorted.length - RECENT_COUNT;
