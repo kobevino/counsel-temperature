@@ -6,11 +6,13 @@ import { BAND_META } from "@/lib/score";
 import { T1_TEMPERATURE, type Intervention } from "@/lib/intervention";
 
 const W = 236;
-const H = 72;
-const PAD_Y = 8;
+const H = 80;
+// 위쪽은 온도 라벨이 들어갈 자리만큼 더 띄운다
+const PAD_TOP = 15;
+const PAD_BOTTOM = 8;
 
 function yFor(temperature: number): number {
-  return PAD_Y + (1 - temperature / 100) * (H - PAD_Y * 2);
+  return PAD_TOP + (1 - temperature / 100) * (H - PAD_TOP - PAD_BOTTOM);
 }
 
 export default function TrendChart({
@@ -32,6 +34,11 @@ export default function TrendChart({
   const path = snapshots
     .map((s, i) => `${i === 0 ? "M" : "L"}${xFor(i)},${yFor(s.temperature)}`)
     .join(" ");
+
+  // 포인트가 촘촘하면 온도 라벨이 겹치므로, 최신 포인트 기준으로 띄엄띄엄 찍는다
+  const labelStep = Math.max(1, Math.ceil(snapshots.length / 10));
+  const showLabel = (i: number) =>
+    hover === i || (snapshots.length - 1 - i) % labelStep === 0;
 
   return (
     <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
@@ -55,7 +62,7 @@ export default function TrendChart({
 
       <div className="relative mt-3">
         {snapshots.length === 0 ? (
-          <div className="flex h-[72px] items-center justify-center text-[12px] text-ink-faint">
+          <div className="flex h-[80px] items-center justify-center text-[12px] text-ink-faint">
             분석 데이터가 아직 없습니다
           </div>
         ) : (
@@ -126,6 +133,24 @@ export default function TrendChart({
                     strokeWidth={2}
                     pointerEvents="none"
                   />
+                  {showLabel(i) && (
+                    <text
+                      x={xFor(i)}
+                      y={yFor(s.temperature) - (fired ? 10 : 7)}
+                      textAnchor="middle"
+                      fontSize={7}
+                      fontWeight={isCurrent ? 700 : 500}
+                      fill={
+                        isCurrent
+                          ? BAND_META[s.band].color
+                          : "var(--color-ink-faint)"
+                      }
+                      className="tabular-nums"
+                      pointerEvents="none"
+                    >
+                      {s.temperature}°
+                    </text>
+                  )}
                 </g>
               );
             })}
