@@ -5,6 +5,7 @@ import { customers } from "@/lib/mock/customers";
 import { customerTurn, MIN_CUSTOMER_MESSAGES } from "@/hooks/useTemperature";
 import { evaluateInterventions } from "@/lib/intervention";
 import TemperatureGauge from "./temperature-gauge";
+import ThermometerLoading, { ThermometerLottie } from "./thermometer-loading";
 import TrendChart from "./trend-chart";
 import DetectedSignals from "./detected-signals";
 import InterventionCard from "./intervention-card";
@@ -49,22 +50,28 @@ export default function CoachPanel({
           >
             다시 분석
           </button>
-          <span className="flex items-center gap-1.5 text-[11px] text-emerald-600">
-            <span
-              className={`h-1.5 w-1.5 rounded-full bg-emerald-500 ${
-                isAnalyzing ? "animate-ping" : ""
-              }`}
-            />
+          <span className="flex items-center gap-1 text-[11px] text-emerald-600">
+            <ThermometerLottie playing={isAnalyzing} className="-my-1 h-6 w-6" />
             {isAnalyzing ? "분석 중" : "실시간 분석"}
           </span>
         </div>
       </div>
 
-      <TemperatureGauge snapshot={latest} customerTurns={turns} />
+      {/* 첫 분석이 도는 동안은 보여줄 데이터가 없으므로 온도계 로딩으로 대체한다 */}
+      {isAnalyzing && !latest ? (
+        <ThermometerLoading />
+      ) : (
+        <>
+          <TemperatureGauge snapshot={latest} customerTurns={turns} />
 
-      <TrendChart snapshots={session.snapshots} interventions={interventions} />
+          <TrendChart
+            snapshots={session.snapshots}
+            interventions={interventions}
+          />
 
-      <DetectedSignals snapshot={latest} startedAt={customer.startedAt} />
+          <DetectedSignals snapshot={latest} startedAt={customer.startedAt} />
+        </>
+      )}
 
       {showDetails && intervention && (
         <InterventionCard snapshot={latest} intervention={intervention} />
