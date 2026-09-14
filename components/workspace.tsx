@@ -19,13 +19,13 @@ export default function Workspace() {
     customers.find((c) => c.id === activeCustomerId) ?? customers[0];
 
   return (
-    <main className="grid h-screen min-w-[900px] grid-cols-[300px_minmax(420px,760px)_minmax(300px,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden">
+    <main className="grid h-screen min-w-[900px] grid-cols-[300px_minmax(380px,520px)_minmax(300px,1fr)] grid-rows-[minmax(0,1fr)] overflow-hidden">
       <CustomerList />
       <ChatPanel customer={customer} />
       <CustomerInfo customer={customer} />
 
       {coachOpen && (
-        <div className="fixed right-6 bottom-24 z-40 flex h-[calc(100vh-8rem)] w-[420px] flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl">
+        <div className="fixed right-6 bottom-24 z-40 flex h-[calc(100vh-8rem)] w-[min(620px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl">
           <CoachPanel
             isAnalyzing={temperature.isAnalyzing}
             isError={temperature.isError}

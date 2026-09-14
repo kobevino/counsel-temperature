@@ -62,35 +62,35 @@ export const BAND_META: Record<
   }
 > = {
   imminent: {
-    label: "이탈 임박",
+    label: "🧊 거의 떠남",
     range: "0-24",
     color: "var(--color-band-imminent)",
     textColor: "var(--color-band-imminent-text)",
     surfacing: "team",
   },
   cold: {
-    label: "차가움",
+    label: "🥶 차가워요",
     range: "25-39",
     color: "var(--color-band-cold)",
     textColor: "var(--color-band-cold-text)",
     surfacing: "card",
   },
   cooling: {
-    label: "식는 중",
+    label: "🌡️ 살짝 식었어요",
     range: "40-54",
     color: "var(--color-band-cooling)",
     textColor: "var(--color-band-cooling-text)",
     surfacing: "counselor",
   },
   lukewarm: {
-    label: "미온",
+    label: "🙂 분위기 좋아요",
     range: "55-69",
     color: "var(--color-band-lukewarm)",
     textColor: "var(--color-band-lukewarm-text)",
     surfacing: "none",
   },
   warm: {
-    label: "따뜻함",
+    label: "🔥 대화가 잘 통해요",
     range: "70-100",
     color: "var(--color-band-warm)",
     textColor: "var(--color-band-warm-text)",

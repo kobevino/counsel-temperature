@@ -54,36 +54,30 @@ export default function TemperatureGauge({
         </div>
       )}
 
-      <div className="mt-4 flex gap-[3px]">
+      <div className="mt-4 grid grid-cols-5 gap-[3px]">
         {BAND_ORDER.map((band) => {
           const active = !insufficient && snapshot.band === band;
           return (
-            <span
-              key={band}
-              className="h-3 flex-1 rounded-full transition-opacity first:rounded-l-full last:rounded-r-full"
-              style={{
-                backgroundColor: BAND_META[band].color,
-                opacity: insufficient ? 0.25 : active ? 1 : 0.3,
-              }}
-            />
+            <div key={band} className="flex flex-col items-center gap-1.5">
+              <span
+                className="h-3 w-full rounded-full transition-opacity"
+                style={{
+                  backgroundColor: BAND_META[band].color,
+                  opacity: insufficient ? 0.25 : active ? 1 : 0.3,
+                }}
+              />
+              <span
+                className="text-[11px] font-bold whitespace-nowrap"
+                style={{ color: BAND_META[band].textColor }}
+              >
+                {BAND_META[band].label}
+              </span>
+              <span className="text-[10px] text-ink-faint">
+                {BAND_META[band].range}
+              </span>
+            </div>
           );
         })}
-      </div>
-
-      <div className="mt-2.5 flex justify-between">
-        {BAND_ORDER.map((band) => (
-          <span key={band} className="flex flex-col gap-0.5">
-            <span
-              className="text-[11px] font-bold"
-              style={{ color: BAND_META[band].textColor }}
-            >
-              {BAND_META[band].label}
-            </span>
-            <span className="text-[10px] text-ink-faint">
-              {BAND_META[band].range}
-            </span>
-          </span>
-        ))}
       </div>
     </div>
   );
