@@ -60,7 +60,7 @@ export default function CoachPanel({
 
       <TrendChart snapshots={session.snapshots} interventions={interventions} />
 
-      {showDetails && <DetectedSignals snapshot={latest} />}
+      <DetectedSignals snapshot={latest} />
 
       {showDetails && intervention && (
         <InterventionCard snapshot={latest} intervention={intervention} />

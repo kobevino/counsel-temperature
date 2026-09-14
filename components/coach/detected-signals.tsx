@@ -12,9 +12,9 @@ import { isPositiveSignal } from "@/lib/signals";
 export default function DetectedSignals({
   snapshot,
 }: {
-  snapshot: TemperatureSnapshot;
+  snapshot: TemperatureSnapshot | undefined;
 }) {
-  const signals = snapshot.signals;
+  const signals = snapshot?.signals ?? [];
 
   return (
     <Link
