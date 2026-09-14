@@ -68,16 +68,16 @@ export default function CoachPanel({
 
         <TemperatureGauge snapshot={latest} customerTurns={turns} />
 
+        {showDetails && intervention && (
+          <InterventionCard snapshot={latest} intervention={intervention} />
+        )}
+
         <TrendChart
           snapshots={session.snapshots}
           interventions={interventions}
         />
 
         <DetectedSignals snapshot={latest} startedAt={customer.startedAt} />
-
-        {showDetails && intervention && (
-          <InterventionCard snapshot={latest} intervention={intervention} />
-        )}
 
         {isError && (
           <button

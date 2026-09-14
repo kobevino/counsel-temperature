@@ -25,11 +25,6 @@ export default function InterventionCard({
   const setDraft = useSessionStore((s) => s.setDraft);
   const { mode, dominant, prescription, reason } = intervention;
 
-  const urgent =
-    mode === "card" &&
-    (snapshot.band === "imminent" || snapshot.band === "cold");
-  const active = mode === "card";
-
   const status =
     mode === "card"
       ? `L2 · ${intervention.triggers.join("+")} · ${reason}`
@@ -43,30 +38,13 @@ export default function InterventionCard({
               ? "개입 불가 (B2)"
               : "트리거 미달 · 관찰 중";
 
-  const accent = urgent
-    ? "text-band-imminent-text"
-    : active
-      ? "text-brand"
-      : "text-ink-soft";
-
   return (
-    <div
-      className={`flex shrink-0 flex-col gap-3 rounded-[10px] border-l-[3px] p-4 ${
-        urgent
-          ? "border-band-imminent bg-alert-bg"
-          : active
-            ? "border-brand bg-brand-soft"
-            : mode === "ops" || mode === "closing"
-              ? "border-ink-faint bg-ops-bg"
-              : "border-line bg-surface"
-      }`}
-    >
+    // 피그마 스펙: 코칭 알림 섹션은 모드와 무관하게 항상 빨간 테마
+    <div className="flex shrink-0 flex-col gap-3 rounded-[10px] border-l-[3px] border-band-imminent bg-alert-bg p-4">
       <p className="flex items-center justify-between gap-2">
-        <span
-          className={`flex items-center gap-1.5 text-[11px] font-extrabold ${accent}`}
-        >
+        <span className="flex items-center gap-[7px] text-[11px] font-extrabold text-band-imminent-text">
           <SparklesIcon className="h-3.5 w-3.5" />
-          AI 개입 제안
+          AI 코칭 알림
         </span>
         <span className="text-right text-[10px] font-semibold tabular-nums text-ink-faint">
           {status}
@@ -144,9 +122,7 @@ export default function InterventionCard({
           </p>
 
           {prescription && (
-            <p
-              className={`text-[11px] leading-[1.5] ${urgent ? "text-band-imminent-text" : "text-ink-soft"}`}
-            >
+            <p className="text-[11px] leading-[1.5] text-band-imminent-text">
               ✕ {prescription.forbid}
             </p>
           )}
@@ -159,9 +135,7 @@ export default function InterventionCard({
 
           <button
             onClick={() => setDraft(prescription?.draft ?? snapshot.nextAction)}
-            className={`flex w-full items-center justify-between rounded-[6px] px-3 py-[9px] text-[12px] font-bold text-white ${
-              urgent ? "bg-band-imminent" : "bg-brand"
-            }`}
+            className="flex w-full items-center justify-between rounded-[6px] bg-band-imminent px-3 py-[9px] text-[11px] font-bold text-white"
           >
             {prescription?.phrase ?? "추천 답변 넣기"}
             <ArrowRightIcon className="h-3 w-3" />
