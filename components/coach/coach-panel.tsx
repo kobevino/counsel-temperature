@@ -5,6 +5,7 @@ import { customerTurn, MIN_CUSTOMER_MESSAGES } from "@/hooks/useTemperature";
 import { evaluateInterventions } from "@/lib/intervention";
 import TemperatureGauge from "./temperature-gauge";
 import TrendChart from "./trend-chart";
+import DetectedSignals from "./detected-signals";
 import InterventionCard from "./intervention-card";
 import EvidenceFooter from "./evidence-footer";
 
@@ -58,6 +59,8 @@ export default function CoachPanel({
       <TemperatureGauge snapshot={latest} customerTurns={turns} />
 
       <TrendChart snapshots={session.snapshots} interventions={interventions} />
+
+      {showDetails && <DetectedSignals snapshot={latest} />}
 
       {showDetails && intervention && (
         <InterventionCard snapshot={latest} intervention={intervention} />

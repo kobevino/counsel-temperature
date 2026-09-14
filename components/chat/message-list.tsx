@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Customer, Message } from "@/lib/types";
 import { formatClock, formatDateLabel } from "@/lib/time";
+import { isPositiveSignal } from "@/lib/signals";
 import { useSessionStore } from "@/store/session";
 
 const NEAR_BOTTOM_PX = 80;
@@ -21,6 +22,22 @@ export default function MessageList({
   const [hasNew, setHasNew] = useState(false);
   const highlightId = useSessionStore((s) => s.highlightId);
   const setHighlight = useSessionStore((s) => s.setHighlight);
+  const latestSnapshot = useSessionStore((s) => {
+    const snapshots = s.sessions[customer.id]?.snapshots;
+    return snapshots?.[snapshots.length - 1];
+  });
+
+  // 감지된 신호 카드와 같은 번호 체계 — 위험 신호가 나온 발화에 "위험 신호 N" 뱃지를 단다
+  const riskBadges = new Map<string, number>();
+  latestSnapshot?.signals.forEach((signal, i) => {
+    if (
+      signal.messageId &&
+      !isPositiveSignal(signal.code) &&
+      !riskBadges.has(signal.messageId)
+    ) {
+      riskBadges.set(signal.messageId, i + 1);
+    }
+  });
 
   const scrollToBottom = () => {
     const el = containerRef.current;
@@ -73,6 +90,7 @@ export default function MessageList({
         <div className="flex flex-col gap-4">
           {messages.map((m) => {
             const mine = m.role === "counselor";
+            const riskBadge = mine ? undefined : riskBadges.get(m.id);
             return (
               <div
                 key={m.id}
@@ -81,12 +99,17 @@ export default function MessageList({
                   highlightId === m.id ? "evidence-flash" : ""
                 }`}
               >
+                {riskBadge !== undefined && (
+                  <span className="mb-1 rounded-full bg-alert-bg px-2 py-0.5 text-[10px] font-bold text-[#e5484d]">
+                    위험 신호 {riskBadge}
+                  </span>
+                )}
                 <div
                   className={`max-w-[70%] rounded-2xl px-3.5 py-2.5 text-[14px] leading-relaxed shadow-[0_1px_2px_rgba(20,24,40,0.05)] ${
                     mine
                       ? "rounded-br-md bg-bubble-counselor"
                       : "rounded-bl-md bg-bubble-customer"
-                  }`}
+                  } ${riskBadge !== undefined ? "border border-[#e5484d]" : ""}`}
                 >
                   {m.text}
                 </div>
