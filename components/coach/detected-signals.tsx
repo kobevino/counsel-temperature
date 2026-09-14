@@ -55,9 +55,9 @@ export default function DetectedSignals({
       href="/churn-reasons"
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)] transition-colors hover:border-brand/40"
+      className="group flex min-h-[220px] flex-1 flex-col rounded-2xl border border-line bg-surface p-3.5 shadow-[0_1px_3px_rgba(20,24,40,0.06)] transition-colors hover:border-brand/40"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex shrink-0 items-center justify-between">
         <p className="text-[14px] font-bold">감지된 신호 {signals.length}개</p>
         <span className="text-[11px] text-ink-faint transition-colors group-hover:text-brand">
           이탈사유 TOP 30 ↗
@@ -69,11 +69,12 @@ export default function DetectedSignals({
           아직 감지된 신호가 없습니다.
         </p>
       ) : (
-        <ul className="mt-3 flex flex-col gap-2">
+        // 목록만 내부에서 스크롤시켜, 신호가 늘거나 펼쳐져도 패널 높이는 그대로 둔다
+        <ul className="mt-2.5 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           {visible.map(({ signal, order }) => {
             const positive = isPositiveSignal(signal.code);
             return (
-              <li key={`${signal.code}-${order}`}>
+              <li key={`${signal.code}-${order}`} className="shrink-0">
                 <button
                   type="button"
                   title="클릭하면 해당 발화로 이동합니다"
@@ -107,7 +108,7 @@ export default function DetectedSignals({
             );
           })}
           {hiddenCount > 0 && (
-            <li>
+            <li className="shrink-0">
               <button
                 type="button"
                 onClick={(e) => {

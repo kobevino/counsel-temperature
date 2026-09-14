@@ -5,10 +5,12 @@ import type { TemperatureSnapshot } from "@/lib/types";
 import { BAND_META } from "@/lib/score";
 import { T1_TEMPERATURE, type Intervention } from "@/lib/intervention";
 
-const W = 236;
-const H = 80;
+// svg는 폭에 맞춰 늘어나므로 viewBox 비율이 곧 렌더 높이다.
+// 가로를 넓게 잡아 확대 배율을 낮추면 카드 높이가 줄고 점·라벨도 과하게 커지지 않는다.
+const W = 340;
+const H = 70;
 // 위쪽은 온도 라벨이 들어갈 자리만큼 더 띄운다
-const PAD_TOP = 15;
+const PAD_TOP = 14;
 const PAD_BOTTOM = 8;
 
 function yFor(temperature: number): number {
@@ -29,7 +31,9 @@ export default function TrendChart({
   const delta = latest && prev ? latest.temperature - prev.temperature : null;
 
   const xFor = (i: number) =>
-    snapshots.length <= 1 ? W - 8 : 8 + (i / (snapshots.length - 1)) * (W - 16);
+    snapshots.length <= 1
+      ? W - 12
+      : 12 + (i / (snapshots.length - 1)) * (W - 24);
 
   const path = snapshots
     .map((s, i) => `${i === 0 ? "M" : "L"}${xFor(i)},${yFor(s.temperature)}`)
@@ -41,7 +45,7 @@ export default function TrendChart({
     hover === i || (snapshots.length - 1 - i) % labelStep === 0;
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
+    <div className="shrink-0 rounded-2xl border border-line bg-surface p-3.5 shadow-[0_1px_3px_rgba(20,24,40,0.06)]">
       <div className="flex items-baseline justify-between">
         <h3 className="text-[13px] font-bold">턴별 대화 온도</h3>
         {delta !== null && delta !== 0 && (
@@ -60,9 +64,9 @@ export default function TrendChart({
         )}
       </div>
 
-      <div className="relative mt-3">
+      <div className="relative mt-2">
         {snapshots.length === 0 ? (
-          <div className="flex h-[80px] items-center justify-center text-[12px] text-ink-faint">
+          <div className="flex h-[110px] items-center justify-center text-[12px] text-ink-faint">
             분석 데이터가 아직 없습니다
           </div>
         ) : (
@@ -79,8 +83,8 @@ export default function TrendChart({
               x2={W}
               y2={yFor(T1_TEMPERATURE)}
               stroke="var(--color-band-cold)"
-              strokeWidth={1}
-              strokeDasharray="3 4"
+              strokeWidth={1.2}
+              strokeDasharray="4 5"
               opacity={0.6}
             />
             {snapshots.length > 1 && (
@@ -88,7 +92,7 @@ export default function TrendChart({
                 d={path}
                 fill="none"
                 stroke="var(--color-ink-faint)"
-                strokeWidth={2}
+                strokeWidth={2.5}
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
@@ -104,7 +108,7 @@ export default function TrendChart({
                   <circle
                     cx={xFor(i)}
                     cy={yFor(s.temperature)}
-                    r={10}
+                    r={12}
                     fill="transparent"
                     onMouseEnter={() => setHover(i)}
                     onMouseLeave={() => setHover(null)}
@@ -113,32 +117,32 @@ export default function TrendChart({
                     <circle
                       cx={xFor(i)}
                       cy={yFor(s.temperature)}
-                      r={7}
+                      r={7.5}
                       fill="none"
                       stroke="var(--color-band-cold)"
-                      strokeWidth={1.5}
+                      strokeWidth={1.8}
                       pointerEvents="none"
                     />
                   )}
                   <circle
                     cx={xFor(i)}
                     cy={yFor(s.temperature)}
-                    r={isCurrent ? 4 : hover === i ? 3.5 : 2.5}
+                    r={isCurrent ? 4.5 : hover === i ? 4 : 3}
                     fill={
                       isCurrent
                         ? BAND_META[s.band].color
                         : "var(--color-ink-faint)"
                     }
                     stroke="var(--color-surface)"
-                    strokeWidth={2}
+                    strokeWidth={2.5}
                     pointerEvents="none"
                   />
                   {showLabel(i) && (
                     <text
                       x={xFor(i)}
-                      y={yFor(s.temperature) - (fired ? 10 : 7)}
+                      y={yFor(s.temperature) - (fired ? 11 : 8)}
                       textAnchor="middle"
-                      fontSize={7}
+                      fontSize={8}
                       fontWeight={isCurrent ? 700 : 500}
                       fill={
                         isCurrent

@@ -43,7 +43,7 @@ export default function InterventionCard({
 
   return (
     <div
-      className={`rounded-2xl border-l-4 p-4 ${
+      className={`shrink-0 rounded-2xl border-l-4 p-3.5 ${
         urgent
           ? "border-band-imminent bg-alert-bg"
           : active

@@ -29,7 +29,7 @@ export default function EvidenceFooter({
   }
 
   return (
-    <div className="px-1">
+    <div className="shrink-0 px-1">
       <p className="text-[11px] leading-relaxed text-ink-faint">
         분석 근거 · 트리거 발화 “{snapshot.trigger}” · 최근 {snapshot.turn}턴 기준
       </p>

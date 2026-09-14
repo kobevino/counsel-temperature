@@ -37,8 +37,10 @@ export default function CoachPanel({
       {/* 분석이 도는 동안 패널 위를 dim 처리하고 온도계 로딩을 띄운다 */}
       {isAnalyzing && <ThermometerLoading />}
 
-      <div className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto bg-canvas p-4">
-        <div className="flex items-center justify-between">
+      {/* 카드들은 고정 높이고, 넘치는 분량은 신호 목록이 안에서 흡수한다.
+          그래서 이 열은 평소에 스크롤이 생기지 않는다 — auto는 창이 아주 낮을 때의 안전장치. */}
+      <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto bg-canvas p-3.5">
+        <div className="flex shrink-0 items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-[11px] font-bold text-white">
               AI
@@ -80,7 +82,7 @@ export default function CoachPanel({
         {isError && (
           <button
             onClick={onReanalyze}
-            className="rounded-lg border border-band-imminent/40 bg-alert-bg px-3 py-2 text-[12px] font-semibold text-band-imminent-text"
+            className="shrink-0 rounded-lg border border-band-imminent/40 bg-alert-bg px-3 py-2 text-[12px] font-semibold text-band-imminent-text"
           >
             분석에 실패했습니다 — 다시 분석
           </button>

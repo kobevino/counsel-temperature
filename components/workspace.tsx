@@ -25,7 +25,7 @@ export default function Workspace() {
       <CustomerInfo customer={customer} />
 
       {coachOpen && (
-        <div className="fixed right-6 bottom-24 z-40 flex h-[calc(100vh-8rem)] w-[min(620px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl">
+        <div className="fixed right-6 bottom-20 z-40 flex h-[calc(100vh-6.5rem)] w-[min(620px,calc(100vw-3rem))] flex-col overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl">
           <CoachPanel
             isAnalyzing={temperature.isAnalyzing}
             isError={temperature.isError}

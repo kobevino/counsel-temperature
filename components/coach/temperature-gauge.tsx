@@ -20,7 +20,7 @@ export default function TemperatureGauge({
       href="/temperature-guide"
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_3px_rgba(20,24,40,0.06)] transition-colors hover:border-brand/40"
+      className="group block shrink-0 rounded-2xl border border-line bg-surface p-3.5 shadow-[0_1px_3px_rgba(20,24,40,0.06)] transition-colors hover:border-brand/40"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[12px] text-ink-soft">현재 대화 온도</p>
@@ -66,7 +66,7 @@ export default function TemperatureGauge({
         </div>
       )}
 
-      <div className="mt-4 grid grid-cols-5 gap-[3px]">
+      <div className="mt-3 grid grid-cols-5 gap-[3px]">
         {BAND_ORDER.map((band) => {
           const active = !insufficient && snapshot.band === band;
           return (
