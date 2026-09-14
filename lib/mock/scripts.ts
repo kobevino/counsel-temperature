@@ -21,7 +21,6 @@ export function openingCount(script: Message[]): number {
  * han(B)  긍정 — 가격 저항 후 대안으로 전환
  * park(C) 이탈 — 보류 ("더 알아보겠다")
  * choi(D) 이탈 — 답변 지연 (고객 발화는 13:44가 마지막, 이후 상담사만 발화)
- * oh(E)   이탈 — 개인정보 부담 → 거절
  */
 export const initialMessages: Record<string, Message[]> = {
   // A. 치아보험 · 40대 여 — 16:10 시작
@@ -196,39 +195,5 @@ export const initialMessages: Record<string, Message[]> = {
       // 익일 09:10 — 상담 시작(13:38)으로부터 19시간 32분
       at: 1172 * MIN,
     },
-  ],
-
-  // E. 운전자보험 · 50대 남 — 15:02 시작
-  oh: [
-    { id: "oh-m1", role: "customer", text: "운전자보험 광고 보고 문의드립니다", at: 0 },
-    { id: "oh-m2", role: "counselor", text: "네! 견적 내드릴게요.", at: 1 * MIN },
-    {
-      id: "oh-m3",
-      role: "counselor",
-      text: "성함, 생년월일, 주소, 직업, 차량번호 알려주세요.",
-      at: 1 * MIN,
-    },
-    { id: "oh-m4", role: "customer", text: "이거 가입 강요하는거 아니죠?", at: 3 * MIN },
-    {
-      id: "oh-m5",
-      role: "counselor",
-      text: "아닙니다. 정확한 견적을 위해 필요합니다.",
-      at: 4 * MIN,
-    },
-    {
-      id: "oh-m6",
-      role: "customer",
-      text: "그냥 대략 얼마인지만 알고 싶은데요",
-      at: 5 * MIN,
-    },
-    {
-      id: "oh-m7",
-      role: "counselor",
-      text: "조건에 따라 달라서 입력이 필요합니다.",
-      at: 6 * MIN,
-    },
-    { id: "oh-m8", role: "customer", text: "왜 차량번호까지 물어보세요", at: 8 * MIN },
-    { id: "oh-m9", role: "counselor", text: "대략 월 2만~3만 2천원입니다.", at: 9 * MIN },
-    { id: "oh-m10", role: "customer", text: "됐어요 다른데서 알아볼게요", at: 10 * MIN },
   ],
 };

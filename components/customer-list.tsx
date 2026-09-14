@@ -10,7 +10,6 @@ const AVATAR_COLORS: Record<string, string> = {
   han: "bg-indigo-200",
   park: "bg-amber-400",
   choi: "bg-rose-200",
-  oh: "bg-sky-200",
 };
 
 const STATUS_TABS = ["접수", "문의", "응대", "종료"] as const;

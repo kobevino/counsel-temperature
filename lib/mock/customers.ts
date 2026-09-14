@@ -1,7 +1,7 @@
 import type { Customer } from "@/lib/types";
 
 /**
- * 시연용 5개 상담 케이스. 대화 원문은 lib/mock/scripts.ts에 있고, 화면에는
+ * 시연용 4개 상담 케이스. 대화 원문은 lib/mock/scripts.ts에 있고, 화면에는
  * 첫 고객 질문만 떠 있다 — 결과(전환/이탈)를 미리 알려주는 태그·라벨은 두지 않는다.
  * 이탈 위험 표시는 분석이 돌아간 뒤 스냅샷에서 파생된다.
  */
@@ -58,20 +58,6 @@ export const customers: Customer[] = [
     startedAt: "13:38",
     tags: ["기존 계약자", "실손 전환", "2세대 보유"],
     lastMessage: "4세대로 바꾸면 얼마 싸져요?",
-    lastMessageAgo: "방금",
-    status: "문의",
-    counselor: "김소연",
-  },
-  {
-    id: "oh",
-    name: "오성철",
-    displayId: "C-240233",
-    ageGroup: "50대",
-    product: "운전자보험",
-    channel: "검색 광고",
-    startedAt: "15:02",
-    tags: ["신규 고객", "운전자보험", "광고 유입"],
-    lastMessage: "운전자보험 광고 보고 문의드립니다",
     lastMessageAgo: "방금",
     status: "문의",
     counselor: "김소연",
