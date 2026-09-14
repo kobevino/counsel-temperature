@@ -11,7 +11,7 @@ import CoachPanel from "@/components/coach/coach-panel";
 import { ChatThermometerIcon } from "@/components/icons";
 
 export default function Workspace() {
-  const [coachOpen, setCoachOpen] = useState(false);
+  const [coachOpen, setCoachOpen] = useState(true);
 
   const activeCustomerId = useSessionStore((s) => s.activeCustomerId);
   const temperature = useTemperature();
