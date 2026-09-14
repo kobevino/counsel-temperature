@@ -43,7 +43,7 @@ export default function CoachPanel({
             <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand text-[11px] font-bold text-white">
               AI
             </span>
-            <h2 className="text-[15px] font-bold">대화 온도계</h2>
+            <h2 className="text-[15px] font-bold">시그널 온도계</h2>
           </div>
           <div className="flex items-center gap-2">
             {/* 고객이 답이 없어 자동 트리거가 돌지 않을 때 수동으로 다시 읽힌다 */}

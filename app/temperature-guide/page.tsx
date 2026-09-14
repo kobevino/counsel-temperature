@@ -162,7 +162,7 @@ export default function TemperatureGuidePage() {
         </section>
 
         <footer className="flex items-center justify-between border-t border-line pt-4 text-[11px] text-ink-faint">
-          <span>대화 온도계 · Habitfactory</span>
+          <span>시그널 온도계 · Habitfactory</span>
           <span>lib/score.ts · lib/signals.ts 기준</span>
         </footer>
       </div>
