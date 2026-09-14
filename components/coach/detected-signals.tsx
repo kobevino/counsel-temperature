@@ -19,6 +19,10 @@ export default function DetectedSignals({
   startedAt: string;
 }) {
   const signals = snapshot?.signals ?? [];
+  // 최근 감지된 신호가 위로 오도록 정렬. 번호(order)는 감지 순서를 유지한다.
+  const sorted = signals
+    .map((signal, order) => ({ signal, order }))
+    .sort((a, b) => (b.signal.at ?? 0) - (a.signal.at ?? 0));
 
   return (
     <Link
@@ -40,11 +44,11 @@ export default function DetectedSignals({
         </p>
       ) : (
         <ul className="mt-3 flex flex-col gap-2">
-          {signals.map((signal, i) => {
+          {sorted.map(({ signal, order }) => {
             const positive = isPositiveSignal(signal.code);
             return (
               <li
-                key={`${signal.code}-${i}`}
+                key={`${signal.code}-${order}`}
                 className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 ${
                   positive ? "bg-emerald-50" : "bg-alert-bg"
                 }`}
@@ -54,7 +58,7 @@ export default function DetectedSignals({
                     positive ? "bg-emerald-500" : "bg-[#e5484d]"
                   }`}
                 >
-                  {i + 1}
+                  {order + 1}
                 </span>
                 <span className="text-[12px] font-medium leading-snug">
                   {signal.label}
