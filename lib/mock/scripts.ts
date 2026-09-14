@@ -19,7 +19,7 @@ export function openingCount(script: Message[]): number {
  *
  * jung(A) 긍정 — 순조로운 전환
  * han(B)  긍정 — 가격 저항 후 대안으로 전환
- * park(C) 이탈 — 보류 ("더 알아보겠다")
+ * park(C) 위기→회복 — 상담사 무응답으로 급락, B5 운영 알림 → 재배정 후 회복
  * choi(D) 이탈 — 답변 지연 (고객 발화는 13:44가 마지막, 이후 상담사만 발화)
  */
 export const initialMessages: Record<string, Message[]> = {
@@ -123,43 +123,46 @@ export const initialMessages: Record<string, Message[]> = {
     },
   ],
 
-  // C. 종신보험 · 30대 남 — 11:15 시작
+  // C. 어린이보험 · 30대 — 12:31 시작. 상담사 무응답 19분에 고객이 식고(B5),
+  // 재배정된 상담사의 사과 + 즉답으로 회복하는 대본.
   park: [
-    { id: "park-m1", role: "customer", text: "종신보험 지금 드는게 나을까요?", at: 0 },
+    { id: "park-m1", role: "customer", text: "6살 아이 어린이보험 알아보는데요", at: 0 },
     {
       id: "park-m2",
       role: "counselor",
-      text: "젊을 때 드시면 보험료가 고정돼서 유리합니다.",
+      text: "네! 자녀분 나이가 어떻게 되나요?",
       at: 1 * MIN,
     },
-    { id: "park-m3", role: "customer", text: "아 그렇구나", at: 3 * MIN },
     {
-      id: "park-m4",
-      role: "counselor",
-      text: "사망보장 1억이면 월 11만원 정도예요.",
-      at: 4 * MIN,
+      id: "park-m3",
+      role: "customer",
+      text: "6살이요, 태아 때 든 게 없어서 처음이에요",
+      at: 3 * MIN,
     },
-    { id: "park-m5", role: "customer", text: "네 생각보다 괜찮네요", at: 6 * MIN },
+    // ── 상담사 무응답 7분 ──
+    { id: "park-m4", role: "customer", text: "저기 보고 계세요?", at: 10 * MIN },
+    // ── 상담사 무응답 12분 (첫 질문부터 19분) → B5 운영 알림 ──
+    {
+      id: "park-m5",
+      role: "customer",
+      text: "아니면 그냥 실비만 되는 건 없나요",
+      at: 22 * MIN,
+    },
+    // A′ 재배정된 상담사 — 13:05
     {
       id: "park-m6",
       role: "counselor",
-      text: "가설계표 보내드릴게요. 정보 몇 가지만 여쭤볼게요.",
-      at: 7 * MIN,
+      text: "기다리게 해서 죄송합니다. 담당이 바뀌었어요.",
+      at: 34 * MIN,
     },
-    { id: "park-m7", role: "customer", text: "아 네", at: 9 * MIN },
     {
-      id: "park-m8",
+      id: "park-m7",
       role: "counselor",
-      text: "성함과 생년월일 먼저 알려주세요.",
-      at: 10 * MIN,
+      text: "6세 남아 표준형 월 3만 4천원입니다. 실비만도 가능하고요.",
+      at: 34 * MIN,
     },
-    { id: "park-m9", role: "customer", text: "조금 더 알아보고 연락드릴게요", at: 11 * MIN },
-    {
-      id: "park-m10",
-      role: "counselor",
-      text: "네 편하게 보시고 언제든 말씀해주세요.",
-      at: 12 * MIN,
-    },
+    { id: "park-m8", role: "customer", text: "아 이게 낫겠네요", at: 37 * MIN },
+    { id: "park-m9", role: "customer", text: "이거 뇌·심장도 들어가요?", at: 39 * MIN },
   ],
 
   // D. 실손 4세대 전환 · 20대 여 — 13:38 시작. 고객 발화는 13:44가 마지막.

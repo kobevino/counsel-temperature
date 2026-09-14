@@ -161,6 +161,12 @@ export const SIGNALS = {
     effects: { trust: -25 },
     hint: '"가입 강요하는 거 아니죠?", "팔려고 그러는 거죠?"',
   },
+  "trust.presence_check": {
+    label: "응대 확인 재촉",
+    source: "customer",
+    effects: { trust: -10 },
+    hint: '"저기 보고 계세요?", "여보세요", "답이 없으시네요" — 응답이 없어 고객이 상담사가 있는지 확인함',
+  },
 
   // ---------- resistance (가중 0.15 · 역산) ----------
   "resist.condition_complaint": {
@@ -203,6 +209,21 @@ export const SIGNALS = {
     effects: { trust: -10 },
     hint: "고객 질문에 상담사가 3분 넘게 답하지 않음",
   },
+  // 아래 두 신호는 "지금 이어지고 있는" 상담사 무응답에만 붙는다 — 상담사가
+  // 답하는 순간 다음 판정의 재계산에서 빠지므로, 지연이 해소되면 온도가
+  // 그만큼 되살아난다. (답이 늦었다는 사실 자체의 흉터는 counselor_delay가 남긴다)
+  "clock.counselor_silent_5m": {
+    label: "상담사 무응답 5분",
+    source: "clock",
+    effects: { trust: -10 },
+    hint: "고객이 답을 기다린 지 5분이 넘었는데 상담사 응답이 없음",
+  },
+  "clock.counselor_silent_15m": {
+    label: "상담사 무응답 15분",
+    source: "clock",
+    effects: { intent: -15, engagement: -35, trust: -15 },
+    hint: "고객이 답을 기다린 지 15분이 넘었는데 상담사 응답이 없음",
+  },
   "clock.silence_10m": {
     label: "무응답 10분",
     source: "clock",
@@ -241,6 +262,9 @@ export const LLM_SIGNAL_CODES = SIGNAL_CODES.filter(
 /** 하락 요인이 상담사 귀책(응답 지연·설명 반복)인지 판정할 때 쓰는 코드 — B5 */
 export const SERVICE_FAULT_CODES: SignalCode[] = [
   "clock.counselor_delay",
+  "clock.counselor_silent_5m",
+  "clock.counselor_silent_15m",
+  "trust.presence_check",
   "trust.repeat_demand",
 ];
 

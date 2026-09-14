@@ -13,6 +13,16 @@ const SILENCE_TIERS: { minutes: number; code: Detection["code"] }[] = [
   { minutes: 480, code: "clock.silence_8h" },
 ];
 
+/**
+ * 상담사 쪽 무응답 단계 — 고객 침묵과 같은 원리로 "지금 이어지고 있는"
+ * 무응답만 센다. 상담사가 답하는 순간 재계산에서 빠져 온도가 되살아나고,
+ * 늦게라도 답했다는 흉터는 counselor_delay(3분)가 따로 남긴다.
+ */
+const COUNSELOR_SILENCE_TIERS: { minutes: number; code: Detection["code"] }[] = [
+  { minutes: 5, code: "clock.counselor_silent_5m" },
+  { minutes: 15, code: "clock.counselor_silent_15m" },
+];
+
 const gapMinutes = (a: Message, b: Message) => (b.at - a.at) / 60_000;
 
 /**
@@ -62,6 +72,19 @@ export function clockDetections(
     const silence = activeMinutesBetween(startedAt, lastCustomer.at, last.at);
     for (const tier of SILENCE_TIERS) {
       if (silence >= tier.minutes) detections.push({ code: tier.code, quote: "" });
+    }
+  }
+
+  // 상담사 무응답 — 마지막 상담사 발화 이후 첫 고객 발화(답을 기다리기 시작한
+  // 시점)부터 지금까지. 고객이 재촉을 이어가도 기다림은 한 덩어리다.
+  const lastCounselorIdx = messages.findLastIndex((m) => m.role === "counselor");
+  const firstWaiting = messages
+    .slice(lastCounselorIdx + 1)
+    .find((m) => m.role === "customer");
+  if (firstWaiting && last) {
+    const waiting = activeMinutesBetween(startedAt, firstWaiting.at, last.at);
+    for (const tier of COUNSELOR_SILENCE_TIERS) {
+      if (waiting >= tier.minutes) detections.push({ code: tier.code, quote: "" });
     }
   }
 

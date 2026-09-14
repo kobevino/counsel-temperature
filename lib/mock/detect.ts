@@ -29,7 +29,9 @@ const CUSTOMER_RULES: Rule[] = [
   },
   // "자기부담금"은 가격 저항이 아니라 상품 용어다
   { code: "intent.price_burden", match: /비싸|비싼|부담(?!금)|가까이|가까운데/ },
-  { code: "intent.alt_request", match: /다른 (상품|거|걸|플랜|설계)|말고/ },
+  // "그냥 실비만 되는 건 없나요" — 지금 논의 중인 상품을 접고 다른 걸 찾는 발화
+  { code: "intent.alt_request", match: /다른 (상품|거|걸|플랜|설계)|말고|그냥 실비만|실비만 되는/ },
+  { code: "trust.presence_check", match: /보고 계세요|보고 계신|여보세요|답이 없/ },
   {
     code: "intent.inquiry",
     match: /얼마|보험료|가격|보장|몇 개|차이|싸져|되나요|있나요|까요|하나요/,
@@ -39,11 +41,11 @@ const CUSTOMER_RULES: Rule[] = [
   {
     // "운전자보험"처럼 상품명에 들어간 단어는 개인 사정 공개가 아니다
     code: "trust.disclosure",
-    match: /남편|아내|아이|자녀|출퇴근|운전(을|이|만|도) |기존 (보험|계약)|2세대|보유|직장/,
+    match: /남편|아내|아이|자녀|태아|출퇴근|운전(을|이|만|도) |기존 (보험|계약)|2세대|보유|직장/,
     unless: /되나요|되죠|가능한가|\?/,
   },
   { code: "resist.condition_complaint", match: /기네요|길네요|짧네요|아쉽|불편/ },
-  { code: "resist.alt_accepted", match: /해볼 만|이 정도면|그걸로 하면/ },
+  { code: "resist.alt_accepted", match: /해볼 만|이 정도면|그걸로 하면|낫겠네요|이게 낫/ },
   { code: "resist.positive", match: /좋네요|괜찮네요|감사|다행|마음에 (들|드)/ },
   { code: "resist.concern_resolved", match: /이해했|알겠네요|그럼 됐네|어차피|미리 드는/ },
 ];
@@ -51,7 +53,8 @@ const CUSTOMER_RULES: Rule[] = [
 const INFO_DEMAND = /성함|생년월일|주민등록|주소|직업|차량번호|정보 (몇 가지|입력|알려)/;
 const PURPOSE = /위해|위한|때문에|목적|용도/;
 const AMOUNT = /\d+\s*만|\d+\s*천원|월 \d/;
-const PRICE_QUESTION = /얼마|보험료|가격|싸져/;
+// "실비만 되는 건 없나요"에 금액으로 즉답하는 경우도 direct_answer로 본다
+const PRICE_QUESTION = /얼마|보험료|가격|싸져|실비만/;
 /** 상담사가 이미 실행한 처방 — 축별로 갈라서 본다 (B3) */
 const ADDRESSING: [Exclude<Reading["counselorAddressing"], "none">, RegExp][] = [
   ["resistance", /낮춘|기한 없|부담 없이|천천히 결정/],
