@@ -59,10 +59,10 @@ function initialSessions(): Record<string, CustomerSession> {
 
 /**
  * 고객별 응답 텀 고정값(ms). 여기 없는 고객은 글자 수 기반 타이핑 시간을 쓴다.
- * 박준호는 답이 너무 즉각적이라 10초 텀으로 늦춰 둔다.
+ * 박준호는 답이 너무 즉각적이라 20초 텀으로 늦춰 둔다.
  */
 const REPLY_DELAY: Record<string, number> = {
-  park: 10_000,
+  park: 20_000,
 };
 
 /** 고객별 텀을 건너뛰고 바로 내려보내는 대본 메시지 */
